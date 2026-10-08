@@ -247,8 +247,13 @@ class BoilerDevice extends Homey.Device {
       if (v.selected) {
         if (!v.open) {
           this.ctl.valvesSince = null;
-          r.heating = false;
-          r.reason += ', no zone valve open';
+          if (s.no_demand === 'off') {
+            r.heating = false;
+            r.reason += ', no zone valve open';
+          } else {
+            r.flow = Math.min(r.flow, s.standby_flow);
+            r.reason += `, no zone valve open: keep warm ${s.standby_flow}`;
+          }
         } else {
           this.ctl.valvesSince = this.ctl.valvesSince || Date.now();
           const wait = s.valve_delay * 60e3 - (Date.now() - this.ctl.valvesSince);
