@@ -32,7 +32,12 @@ Homey cannot use USB devices, so the bus has to be reachable over the network:
 
 1. **ebusd** on a Raspberry Pi / PC with a USB eBUS adapter — start it with `--enablehex`:
    `ebusd -d /dev/ttyUSB0 --port=8888 --enablehex --scanconfig`
-2. **Adapter with enhanced protocol over TCP** (ebusd.eu v5 / v5-C6, port 9999, or an ESP firmware implementing it) — the app talks to it directly, no ebusd needed. *Not yet tested on hardware.*
+2. **An ebusd.eu adapter directly**, with no ebusd and no PC at all (v5, Shield C5, Shield C6, Stick C6):
+   update its firmware, connect it to your Wi-Fi (it opens an open AP named `EBUS`, then http://192.168.4.1),
+   wire it to the bus (polarity does not matter), and point this app at its IP on port 9999 with
+   connection type *Adapter, enhanced protocol*. The enhanced protocol is the adapter's free standard
+   mode — the paid token on those adapters is only for *micro-ebusd*, which this app does not use.
+   *Not yet tested on hardware.*
 
 ## Development
 
