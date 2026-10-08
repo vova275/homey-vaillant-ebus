@@ -24,6 +24,7 @@ Flow cards: flame on/off, error changed, pressure changed; conditions flame is o
 * The boiler display keeps showing the **panel** setpoint. The value actually used is diagnostics **d.05** — that is what this app sets and reads.
 * The bus setpoint is **not** limited by the panel value (45 °C was accepted with the panel at 39 °C).
 * The boiler keeps the last bus setpoint for a long time without refresh (> 8 min observed). Turning *Controlled by Homey* off therefore sends the learned panel values back.
+* **Changing the panel does not override a bus setpoint**: with 45 °C sent over the bus, turning the panel to 38 °C left d.05 at 45 and the boiler kept heating to 45. While Homey is in control, use Homey (or turn control off) to change the setpoint.
 
 ## Hardware
 
