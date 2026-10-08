@@ -80,7 +80,7 @@
   "drivers": [
     {
       "id": "boiler",
-      "name": { "en": "Vaillant boiler" },
+      "name": { "en": "Vaillant gas boiler" },
       "class": "thermostat",
       "platforms": ["local"],
       "connectivity": ["lan"],

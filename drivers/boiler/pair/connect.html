@@ -37,29 +37,29 @@
 </form>
 
 <script>
-  const $ = (id) => document.getElementById(id);
-  $('transport').addEventListener('change', () => {
-    const enh = $('transport').value === 'enhanced';
-    $('port').value = enh ? 9999 : 8888;
-    $('addrField').style.display = enh ? '' : 'none';
+  const el = (id) => document.getElementById(id);
+  el('transport').addEventListener('change', () => {
+    const enh = el('transport').value === 'enhanced';
+    el('port').value = enh ? 9999 : 8888;
+    el('addrField').style.display = enh ? '' : 'none';
   });
-  $('go').addEventListener('click', async () => {
-    $('go').classList.add('is-loading');
-    $('result').textContent = '';
+  el('go').addEventListener('click', async () => {
+    el('go').classList.add('is-loading');
+    el('result').textContent = '';
     try {
       const r = await Homey.emit('connect', {
-        transport: $('transport').value,
-        host: $('host').value.trim(),
-        port: $('port').value,
-        address: $('address').value.trim(),
+        transport: el('transport').value,
+        host: el('host').value.trim(),
+        port: el('port').value,
+        address: el('address').value.trim(),
       });
-      $('result').textContent = `Found ${r.ident.manufacturer} ${r.ident.id} (SW ${r.ident.sw})\n`
+      el('result').textContent = `Found ${r.ident.manufacturer} ${r.ident.id} (SW ${r.ident.sw})\n`
         + `Flow ${r.state.flowTemp} °C, pressure ${r.state.pressure} bar`;
       setTimeout(() => Homey.showView('list_devices'), 1200);
     } catch (err) {
-      $('result').textContent = `Failed: ${err.message || err}`;
+      el('result').textContent = `Failed: ${err.message || err}`;
     } finally {
-      $('go').classList.remove('is-loading');
+      el('go').classList.remove('is-loading');
     }
   });
 </script>
