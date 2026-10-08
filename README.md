@@ -15,7 +15,7 @@ Tested with **Vaillant BAI00, SW 0403 / HW 0903** (no room controller on the bus
 | **Heating flow setpoint** (writable) | `b510 00` SetMode, as a VRC controller sends it |
 | **Hot-water setpoint** (writable) | `b510 00` SetMode |
 | Heating on/off (writable) | SetMode disable bit |
-| *Controlled by Homey* toggle | on: setpoint refreshed every 60 s; off: panel values sent back |
+| *Controlled by Homey* toggle | on: setpoint re-sent every 60 s (overrides the panel); off: Homey only shows the boiler's setpoint |
 
 Flow cards: flame on/off, error changed, pressure changed; conditions flame is on, pressure below; actions set flow / hot-water setpoint, control on/off.
 
@@ -23,7 +23,7 @@ Flow cards: flame on/off, error changed, pressure changed; conditions flame is o
 
 * The boiler display keeps showing the **panel** setpoint. The value actually used is diagnostics **d.05** — that is what this app sets and reads.
 * The bus setpoint is **not** limited by the panel value (45 °C was accepted with the panel at 39 °C).
-* The boiler keeps the last bus setpoint for a long time without refresh (> 8 min observed). Turning *Controlled by Homey* off therefore sends the learned panel values back.
+* The boiler keeps the last bus setpoint for a long time without refresh (> 8 min observed) — until the panel is changed.
 * Panel and bus share one setpoint (d.05, also mirrored at register `03e8`): **whichever was changed last wins**. Turning the panel 38 → 37 moved d.05 to 37 after a bus value of 38; in an earlier test a panel change did not show up within ~1 min, so it may apply with a delay. While Homey is in control it re-sends its setpoint every refresh interval, which overrides panel changes.
 * There is no separate readable "panel" register: a register sweep (`tools/scan-registers.js`) found only d.05 and its mirror changing with the panel.
 

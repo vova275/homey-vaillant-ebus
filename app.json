@@ -3,24 +3,41 @@
   "version": "0.1.0",
   "compatibility": ">=12.0.0",
   "sdk": 3,
-  "platforms": ["local"],
-  "name": { "en": "Vaillant eBUS" },
-  "description": { "en": "Local monitoring and control of Vaillant boilers over eBUS" },
-  "category": ["climate"],
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Vaillant eBUS"
+  },
+  "description": {
+    "en": "Local monitoring and control of Vaillant boilers over eBUS"
+  },
+  "category": [
+    "climate"
+  ],
   "brandColor": "#00917E",
   "permissions": [],
   "images": {
     "small": "/assets/images/small.png",
     "large": "/assets/images/large.png"
   },
-  "author": { "name": "vova275", "email": "vova275@gmail.com" },
+  "author": {
+    "name": "vova275",
+    "email": "vova275@gmail.com"
+  },
   "source": "https://github.com/vova275/homey-vaillant-ebus",
-  "bugs": { "url": "https://github.com/vova275/homey-vaillant-ebus/issues" },
+  "bugs": {
+    "url": "https://github.com/vova275/homey-vaillant-ebus/issues"
+  },
   "capabilities": {
     "measure_water_pressure": {
       "type": "number",
-      "title": { "en": "Water pressure" },
-      "units": { "en": "bar" },
+      "title": {
+        "en": "Water pressure"
+      },
+      "units": {
+        "en": "bar"
+      },
       "decimals": 2,
       "getable": true,
       "setable": false,
@@ -30,8 +47,12 @@
     },
     "measure_modulation": {
       "type": "number",
-      "title": { "en": "Modulation" },
-      "units": { "en": "%" },
+      "title": {
+        "en": "Modulation"
+      },
+      "units": {
+        "en": "%"
+      },
       "decimals": 0,
       "getable": true,
       "setable": false,
@@ -41,18 +62,26 @@
     },
     "flame_on": {
       "type": "boolean",
-      "title": { "en": "Flame" },
+      "title": {
+        "en": "Flame"
+      },
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
       "insights": true,
-      "insightsTitleTrue": { "en": "Flame on" },
-      "insightsTitleFalse": { "en": "Flame off" },
+      "insightsTitleTrue": {
+        "en": "Flame on"
+      },
+      "insightsTitleFalse": {
+        "en": "Flame off"
+      },
       "icon": "/assets/capabilities/flame.svg"
     },
     "hwc_demand": {
       "type": "boolean",
-      "title": { "en": "Hot water demand" },
+      "title": {
+        "en": "Hot water demand"
+      },
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
@@ -61,16 +90,23 @@
     },
     "bus_control": {
       "type": "boolean",
-      "title": { "en": "Controlled by Homey" },
+      "title": {
+        "en": "Controlled by Homey"
+      },
       "getable": true,
       "setable": true,
       "uiComponent": "toggle",
       "insights": false,
-      "icon": "/assets/capabilities/control.svg"
+      "icon": "/assets/capabilities/control.svg",
+      "desc": {
+        "en": "On: Homey re-sends its setpoints every minute and overrides the boiler panel. Off: the boiler panel is in charge."
+      }
     },
     "boiler_error": {
       "type": "string",
-      "title": { "en": "Error" },
+      "title": {
+        "en": "Error"
+      },
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
@@ -80,10 +116,16 @@
   "drivers": [
     {
       "id": "boiler",
-      "name": { "en": "Vaillant gas boiler" },
+      "name": {
+        "en": "Vaillant gas boiler"
+      },
       "class": "thermostat",
-      "platforms": ["local"],
-      "connectivity": ["lan"],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
       "capabilities": [
         "target_temperature",
         "measure_temperature",
@@ -101,70 +143,162 @@
       ],
       "capabilitiesOptions": {
         "target_temperature": {
-          "title": { "en": "Heating flow setpoint" },
-          "min": 20, "max": 80, "step": 1
+          "title": {
+            "en": "Heating flow setpoint"
+          },
+          "min": 20,
+          "max": 80,
+          "step": 1
         },
-        "measure_temperature": { "title": { "en": "Flow temperature" } },
-        "measure_temperature.return": { "title": { "en": "Return temperature" } },
-        "measure_temperature.hwc": { "title": { "en": "Hot water temperature" } },
+        "measure_temperature": {
+          "title": {
+            "en": "Flow temperature (boiler outlet)"
+          }
+        },
+        "measure_temperature.return": {
+          "title": {
+            "en": "Return temperature"
+          }
+        },
+        "measure_temperature.hwc": {
+          "title": {
+            "en": "Hot water temperature"
+          }
+        },
         "target_temperature.hwc": {
-          "title": { "en": "Hot water setpoint" },
-          "min": 35, "max": 65, "step": 1
+          "title": {
+            "en": "Hot water setpoint"
+          },
+          "min": 35,
+          "max": 65,
+          "step": 1
         },
-        "onoff": { "title": { "en": "Heating" } },
-        "alarm_generic": { "title": { "en": "Boiler fault" } }
+        "onoff": {
+          "title": {
+            "en": "Heating"
+          }
+        },
+        "alarm_generic": {
+          "title": {
+            "en": "Boiler fault"
+          }
+        }
       },
       "images": {
         "small": "/drivers/boiler/assets/images/small.png",
         "large": "/drivers/boiler/assets/images/large.png"
       },
       "pair": [
-        { "id": "connect" },
-        { "id": "list_devices", "template": "list_devices", "navigation": { "next": "add_devices" } },
-        { "id": "add_devices", "template": "add_devices" }
+        {
+          "id": "connect"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
       ],
       "settings": [
         {
           "type": "group",
-          "label": { "en": "Connection" },
+          "label": {
+            "en": "Connection"
+          },
           "children": [
             {
               "id": "transport",
               "type": "dropdown",
-              "label": { "en": "Connection type" },
+              "label": {
+                "en": "Connection type"
+              },
               "value": "ebusd",
               "values": [
-                { "id": "ebusd", "label": { "en": "ebusd daemon (TCP 8888, needs --enablehex)" } },
-                { "id": "enhanced", "label": { "en": "Adapter, enhanced protocol (v5/v5-C6/ESP)" } }
+                {
+                  "id": "ebusd",
+                  "label": {
+                    "en": "ebusd daemon (TCP 8888, needs --enablehex)"
+                  }
+                },
+                {
+                  "id": "enhanced",
+                  "label": {
+                    "en": "Adapter, enhanced protocol (v5/v5-C6/ESP)"
+                  }
+                }
               ]
             },
-            { "id": "host", "type": "text", "label": { "en": "Host / IP" }, "value": "" },
-            { "id": "port", "type": "number", "label": { "en": "Port" }, "value": 8888, "min": 1, "max": 65535 },
+            {
+              "id": "host",
+              "type": "text",
+              "label": {
+                "en": "Host / IP"
+              },
+              "value": ""
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Port"
+              },
+              "value": 8888,
+              "min": 1,
+              "max": 65535
+            },
             {
               "id": "address",
               "type": "text",
-              "label": { "en": "Own master address (hex, enhanced only)" },
+              "label": {
+                "en": "Own master address (hex, enhanced only)"
+              },
               "value": "31",
-              "hint": { "en": "Must be a free eBUS master address. 31 is ebusd's default; do not use 10 if a Vaillant controller is on the bus." }
+              "hint": {
+                "en": "Must be a free eBUS master address. 31 is ebusd's default; do not use 10 if a Vaillant controller is on the bus."
+              }
             }
           ]
         },
         {
           "type": "group",
-          "label": { "en": "Timing" },
+          "label": {
+            "en": "Timing"
+          },
           "children": [
-            { "id": "poll_interval", "type": "number", "label": { "en": "Poll interval" }, "units": { "en": "s" }, "value": 30, "min": 10, "max": 600 },
-            { "id": "control_interval", "type": "number", "label": { "en": "Setpoint refresh interval" }, "units": { "en": "s" }, "value": 60, "min": 15, "max": 600,
-              "hint": { "en": "How often the setpoint is re-sent while Homey controls the boiler, like a room controller does." } }
-          ]
-        },
-        {
-          "type": "group",
-          "label": { "en": "Boiler panel values" },
-          "children": [
-            { "id": "panel_flow", "type": "number", "label": { "en": "Panel heating setpoint" }, "units": { "en": "°C" }, "value": 0, "min": 0, "max": 90,
-              "hint": { "en": "Learned automatically while Homey does not control the boiler. Sent back when control is switched off." } },
-            { "id": "panel_hwc", "type": "number", "label": { "en": "Panel hot water setpoint" }, "units": { "en": "°C" }, "value": 0, "min": 0, "max": 90 }
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Poll interval"
+              },
+              "units": {
+                "en": "s"
+              },
+              "value": 15,
+              "min": 5,
+              "max": 600
+            },
+            {
+              "id": "control_interval",
+              "type": "number",
+              "label": {
+                "en": "Setpoint refresh interval"
+              },
+              "units": {
+                "en": "s"
+              },
+              "value": 60,
+              "min": 15,
+              "max": 600,
+              "hint": {
+                "en": "How often the setpoint is re-sent while Homey controls the boiler, like a room controller does."
+              }
+            }
           ]
         }
       ]
@@ -172,68 +306,214 @@
   ],
   "flow": {
     "triggers": [
-      { "id": "flame_on", "title": { "en": "Flame turned on" }, "args": [{ "name": "device", "type": "device", "filter": "driver_id=boiler" }] },
-      { "id": "flame_off", "title": { "en": "Flame turned off" }, "args": [{ "name": "device", "type": "device", "filter": "driver_id=boiler" }] },
+      {
+        "id": "flame_on",
+        "title": {
+          "en": "Flame turned on"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
+      },
+      {
+        "id": "flame_off",
+        "title": {
+          "en": "Flame turned off"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
+      },
       {
         "id": "error_changed",
-        "title": { "en": "Boiler error changed" },
+        "title": {
+          "en": "Boiler error changed"
+        },
         "tokens": [
-          { "name": "error", "type": "string", "title": { "en": "Error" }, "example": { "en": "F.28" } },
-          { "name": "active", "type": "boolean", "title": { "en": "Fault active" } }
+          {
+            "name": "error",
+            "type": "string",
+            "title": {
+              "en": "Error"
+            },
+            "example": {
+              "en": "F.28"
+            }
+          },
+          {
+            "name": "active",
+            "type": "boolean",
+            "title": {
+              "en": "Fault active"
+            }
+          }
         ],
-        "args": [{ "name": "device", "type": "device", "filter": "driver_id=boiler" }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
       },
       {
         "id": "pressure_changed",
-        "title": { "en": "Water pressure changed" },
-        "tokens": [{ "name": "pressure", "type": "number", "title": { "en": "Pressure (bar)" }, "example": 1.6 }],
-        "args": [{ "name": "device", "type": "device", "filter": "driver_id=boiler" }]
+        "title": {
+          "en": "Water pressure changed"
+        },
+        "tokens": [
+          {
+            "name": "pressure",
+            "type": "number",
+            "title": {
+              "en": "Pressure (bar)"
+            },
+            "example": 1.6
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
       }
     ],
     "conditions": [
       {
         "id": "flame_is_on",
-        "title": { "en": "Flame is !{{on|off}}" },
-        "args": [{ "name": "device", "type": "device", "filter": "driver_id=boiler" }]
+        "title": {
+          "en": "Flame is !{{on|off}}"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
       },
       {
         "id": "pressure_below",
-        "title": { "en": "Water pressure is !{{below|above}}" },
-        "titleFormatted": { "en": "Water pressure is !{{below|above}} [[bar]] bar" },
+        "title": {
+          "en": "Water pressure is !{{below|above}}"
+        },
+        "titleFormatted": {
+          "en": "Water pressure is !{{below|above}} [[bar]] bar"
+        },
         "args": [
-          { "name": "device", "type": "device", "filter": "driver_id=boiler" },
-          { "name": "bar", "type": "number", "min": 0, "max": 4, "step": 0.1, "placeholder": { "en": "1.0" } }
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "bar",
+            "type": "number",
+            "min": 0,
+            "max": 4,
+            "step": 0.1,
+            "placeholder": {
+              "en": "1.0"
+            }
+          }
         ]
       }
     ],
     "actions": [
       {
         "id": "set_flow_temperature",
-        "title": { "en": "Set heating flow setpoint" },
-        "titleFormatted": { "en": "Set heating flow setpoint to [[temperature]] °C" },
-        "hint": { "en": "Also switches on control by Homey." },
+        "title": {
+          "en": "Set heating flow setpoint"
+        },
+        "titleFormatted": {
+          "en": "Set heating flow setpoint to [[temperature]] °C"
+        },
+        "hint": {
+          "en": "Also switches on control by Homey."
+        },
         "args": [
-          { "name": "device", "type": "device", "filter": "driver_id=boiler" },
-          { "name": "temperature", "type": "number", "min": 20, "max": 80, "step": 1 }
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "min": 20,
+            "max": 80,
+            "step": 1
+          }
         ]
       },
       {
         "id": "set_hwc_temperature",
-        "title": { "en": "Set hot water setpoint" },
-        "titleFormatted": { "en": "Set hot water setpoint to [[temperature]] °C" },
-        "hint": { "en": "Also switches on control by Homey." },
+        "title": {
+          "en": "Set hot water setpoint"
+        },
+        "titleFormatted": {
+          "en": "Set hot water setpoint to [[temperature]] °C"
+        },
+        "hint": {
+          "en": "Also switches on control by Homey."
+        },
         "args": [
-          { "name": "device", "type": "device", "filter": "driver_id=boiler" },
-          { "name": "temperature", "type": "number", "min": 35, "max": 65, "step": 1 }
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "min": 35,
+            "max": 65,
+            "step": 1
+          }
         ]
       },
       {
         "id": "set_bus_control",
-        "title": { "en": "Turn control by Homey" },
-        "titleFormatted": { "en": "Turn control by Homey [[state]]" },
+        "title": {
+          "en": "Turn control by Homey"
+        },
+        "titleFormatted": {
+          "en": "Turn control by Homey [[state]]"
+        },
         "args": [
-          { "name": "device", "type": "device", "filter": "driver_id=boiler" },
-          { "name": "state", "type": "dropdown", "values": [{ "id": "on", "label": { "en": "on" } }, { "id": "off", "label": { "en": "off (boiler panel)" } }] }
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "state",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "on",
+                "label": {
+                  "en": "on"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "off (boiler panel)"
+                }
+              }
+            ]
+          }
         ]
       }
     ]

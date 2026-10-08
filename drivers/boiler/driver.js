@@ -43,10 +43,10 @@ class BoilerDriver extends Homey.Driver {
           data: { id: `${host}:${port}:08` },
           settings: {
             transport, host, port: Number(port), address: addr.toString(16),
-            panel_flow: state.flowTempDesired || 0,
-            panel_hwc: state.hwcTempDesired || 0,
           },
-          store: { ident },
+          store: {
+            ident, control: false, flow: state.flowTempDesired || 40, hwc: state.hwcTempDesired || 50,
+          },
         };
         return { ident, state };
       } finally {

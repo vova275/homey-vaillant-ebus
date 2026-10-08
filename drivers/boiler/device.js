@@ -3,9 +3,9 @@
 const Homey = require('homey');
 const { Boiler } = require('../../lib/boiler');
 
-// The boiler keeps the last bus setpoint for a long time on its own (observed
-// > 8 min with no refresh), so switching control off has to send the panel
-// values back explicitly instead of just going quiet.
+// Panel and bus share one setpoint (d.05): whichever changed last wins. While
+// Homey is in control it re-sends its setpoint every refresh interval; when it
+// is not, the target capabilities just mirror what the boiler currently uses.
 
 class BoilerDevice extends Homey.Device {
   async onInit() {
@@ -16,16 +16,19 @@ class BoilerDevice extends Homey.Device {
 
     if (!this.hasCapability('bus_control')) await this.addCapability('bus_control');
 
-    this.registerCapabilityListener('target_temperature', (v) => this.setTarget('flow', v));
-    this.registerCapabilityListener('target_temperature.hwc', (v) => this.setTarget('hwc', v));
-    this.registerCapabilityListener('onoff', (v) => this.setHeating(v));
-    this.registerCapabilityListener('bus_control', (v) => this.setBusControl(v));
+    const listen = (cap, fn) => this.registerCapabilityListener(cap, (v) => {
+      this.log(`${cap} -> ${v} (from Homey)`);
+      return fn(v);
+    });
+    listen('target_temperature', (v) => this.setTarget('flow', v));
+    listen('target_temperature.hwc', (v) => this.setTarget('hwc', v));
+    listen('onoff', (v) => this.setHeating(v));
+    listen('bus_control', (v) => this.setBusControl(v));
 
-    // restore what Homey last asked for, defaulting to the panel values
-    const s = this.getSettings();
+    // restore what Homey last asked for
     this.targets = {
-      flow: this.getStoreValue('flow') ?? (s.panel_flow || 40),
-      hwc: this.getStoreValue('hwc') ?? (s.panel_hwc || 50),
+      flow: this.getStoreValue('flow') ?? 40,
+      hwc: this.getStoreValue('hwc') ?? 50,
       heating: this.getStoreValue('heating') ?? true,
       control: this.getStoreValue('control') ?? false,
     };
@@ -114,13 +117,10 @@ class BoilerDevice extends Homey.Device {
       this.driver.pressureChanged.trigger(this, { pressure: st.pressure }).catch(this.error);
     }
 
-    // while Homey is not in control the boiler runs on its panel: remember those values
+    // not in control: show the setpoints the boiler actually uses (panel or last bus value)
     if (!this.targets.control) {
-      const s = this.getSettings();
-      const patch = {};
-      if (st.flowTempDesired >= 20 && st.flowTempDesired !== s.panel_flow) patch.panel_flow = st.flowTempDesired;
-      if (st.hwcTempDesired >= 30 && st.hwcTempDesired !== s.panel_hwc) patch.panel_hwc = st.hwcTempDesired;
-      if (Object.keys(patch).length) await this.setSettings(patch).catch(this.error);
+      if (st.flowTempDesired >= 20) { this.targets.flow = st.flowTempDesired; await upd('target_temperature', st.flowTempDesired); }
+      if (st.hwcTempDesired >= 30) { this.targets.hwc = st.hwcTempDesired; await upd('target_temperature.hwc', st.hwcTempDesired); }
     }
   }
 
@@ -166,15 +166,8 @@ class BoilerDevice extends Homey.Device {
     this.targets.control = on;
     await this._save();
     await this._show();
-    if (on) {
-      await this._refresh();
-    } else {
-      // hand the boiler back to its own panel
-      const s = this.getSettings();
-      if (s.panel_flow >= 20) {
-        await this._send({ flowTemp: s.panel_flow, hwcTemp: s.panel_hwc >= 30 ? s.panel_hwc : this.targets.hwc });
-      }
-    }
+    // off: just stop re-sending; the panel takes over with its next change
+    if (on) await this._refresh();
     this.homey.setTimeout(() => this.poll(), 3000);
   }
 
