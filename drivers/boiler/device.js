@@ -44,6 +44,12 @@ class BoilerDevice extends Homey.Device {
     };
     await this._show();
     this._connect();
+
+    // zone valve relays: react to a valve switching right away (debounced)
+    this.app.sensors.watchValves(() => {
+      this.homey.clearTimeout(this.valveTimer);
+      this.valveTimer = this.homey.setTimeout(() => this.control(), 2000);
+    }).catch((err) => this.log('watch valves:', err.message));
   }
 
   /** Bring a device paired with an older version to the current capability list. */
@@ -234,6 +240,29 @@ class BoilerDevice extends Homey.Device {
       boostFlow: s.boost_flow,
     }, this.ctl.pid);
     this.ctl.pid = r.state;
+
+    // zone valves: heat only while at least one is open, after the actuator delay
+    if (r.heating) {
+      const v = await this.app.sensors.valves().catch(() => ({ selected: 0, open: 0 }));
+      if (v.selected) {
+        if (!v.open) {
+          this.ctl.valvesSince = null;
+          r.heating = false;
+          r.reason += ', no zone valve open';
+        } else {
+          this.ctl.valvesSince = this.ctl.valvesSince || Date.now();
+          const wait = s.valve_delay * 60e3 - (Date.now() - this.ctl.valvesSince);
+          if (wait > 0) {
+            r.heating = false;
+            r.reason += `, ${v.open} valve(s) opening`;
+            this.homey.clearTimeout(this.valveTimer);
+            this.valveTimer = this.homey.setTimeout(() => this.control(), wait + 1000);
+          } else {
+            r.reason += `, ${v.open}/${v.selected} valves open`;
+          }
+        }
+      }
+    }
     await this.setStoreValue('ctl', this.ctl);
 
     if (s.regulation !== 'manual' || this._t.mode === 'boost') await this._set('target_temperature.flow', r.flow);

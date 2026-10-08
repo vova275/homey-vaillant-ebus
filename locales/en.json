@@ -28,6 +28,13 @@
     "now": "Now",
     "room": "room",
     "save": "Save",
-    "saved": "Saved"
+    "saved": "Saved",
+    "roomsHint": "Only tick sensors you trust. Leave empty if room temperatures are already handled by zone thermostats.",
+    "valves": "Zone valves / relays (heat demand)",
+    "valvesHint": "Heating runs only while at least one of these is on (valve open). Leave empty to ignore.",
+    "valvesOpen": "valves open",
+    "noDevices": "No suitable devices found in Homey.",
+    "on": "on",
+    "off": "off"
   }
 }

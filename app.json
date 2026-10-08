@@ -706,6 +706,28 @@
                 "uk": "°C"
               },
               "step": 0.1
+            },
+            {
+              "id": "valve_delay",
+              "type": "number",
+              "label": {
+                "en": "Valve opening delay",
+                "ru": "Задержка открытия клапанов",
+                "uk": "Затримка відкриття клапанів"
+              },
+              "value": 2,
+              "min": 0,
+              "max": 10,
+              "units": {
+                "en": "min",
+                "ru": "мин",
+                "uk": "хв"
+              },
+              "hint": {
+                "en": "Zone valves (app settings): heating starts this long after the first valve opens, so the actuators are open before the pump pushes water.",
+                "ru": "Клапаны зон (настройки приложения): отопление включается через это время после открытия первого клапана, чтобы сервоприводы успели открыться.",
+                "uk": "Клапани зон (налаштування застосунку): опалення вмикається через цей час після відкриття першого клапана, щоб сервоприводи встигли відкритися."
+              }
             }
           ]
         },
@@ -1531,6 +1553,10 @@
     "getPreview": {
       "method": "GET",
       "path": "/preview"
+    },
+    "getSwitches": {
+      "method": "GET",
+      "path": "/switches"
     }
   }
 }

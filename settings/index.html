@@ -26,7 +26,14 @@
 
   <fieldset class="homey-form-fieldset">
     <legend class="homey-form-legend" data-i18n="settings.rooms"></legend>
+    <p class="hint" data-i18n="settings.roomsHint"></p>
     <div id="rooms" data-i18n="settings.loading"></div>
+  </fieldset>
+
+  <fieldset class="homey-form-fieldset">
+    <legend class="homey-form-legend" data-i18n="settings.valves"></legend>
+    <p class="hint" data-i18n="settings.valvesHint"></p>
+    <div id="valves" data-i18n="settings.loading"></div>
   </fieldset>
 
   <div id="preview"></div>
@@ -38,45 +45,51 @@
       document.querySelectorAll("[data-i18n]").forEach((n) => { n.textContent = Homey.__(n.dataset.i18n); });
       const get = (k) => new Promise((res) => Homey.get(k, (e, v) => res(e ? null : v)));
       const set = (k, v) => new Promise((res, rej) => Homey.set(k, v, (e) => (e ? rej(e) : res())));
-      const api = (path) => new Promise((res, rej) => Homey.api('GET', path, null, (e, v) => (e ? rej(e) : res(v))));
+      const api = (path) => new Promise((res, rej) => Homey.api("GET", path, null, (e, v) => (e ? rej(e) : res(v))));
 
       async function preview() {
         try {
-          const p = await api('/preview');
-          el('preview').textContent = `${Homey.__('settings.now')}: ${Homey.__('settings.room')} ${p.room ?? '—'} °C, ${Homey.__('settings.outdoor')} ${p.outdoor ?? '—'} °C`;
-        } catch (e) { el('preview').textContent = ''; }
+          const p = await api("/preview");
+          const v = p.valves.selected ? `, ${Homey.__("settings.valvesOpen")} ${p.valves.open}/${p.valves.selected}` : "";
+          el("preview").textContent = `${Homey.__("settings.now")}: ${Homey.__("settings.room")} ${p.room ?? "—"} °C, ${Homey.__("settings.outdoor")} ${p.outdoor ?? "—"} °C${v}`;
+        } catch (e) { el("preview").textContent = ""; }
       }
 
-      (async () => {
-        const [sensors, rooms, outdoor] = await Promise.all([api('/sensors'), get('roomSensors'), get('outdoorSource')]);
-        const chosen = new Set(rooms || []);
-        const sel = el('outdoor');
-        sel.add(new Option(Homey.__('settings.weather'), 'weather'));
-        sel.add(new Option(Homey.__('settings.none'), 'none'));
-        sensors.forEach((s) => sel.add(new Option(`${s.zone ? `${s.zone} / ` : ''}${s.name} (${s.value ?? '—'} °C)`, s.id)));
-        sel.value = outdoor || 'weather';
-
-        el('rooms').innerHTML = '';
-        if (!sensors.length) el('rooms').textContent = Homey.__('settings.noSensors');
-        sensors.forEach((s) => {
-          const row = document.createElement('label');
-          row.className = 'homey-form-checkbox row';
+      function checklist(box, items, chosen, fmt) {
+        box.innerHTML = "";
+        if (!items.length) { box.textContent = Homey.__("settings.noDevices"); return; }
+        items.forEach((s) => {
+          const row = document.createElement("label");
+          row.className = "homey-form-checkbox row";
           row.innerHTML = `<input type="checkbox" class="homey-form-checkbox-input" value="${s.id}">
             <span class="homey-form-checkbox-checkmark"></span>
             <span class="homey-form-checkbox-text name">${s.name}<br><span class="zone">${s.zone}</span></span>
-            <span class="val">${s.value ?? '—'} °C</span>`;
-          row.querySelector('input').checked = chosen.has(s.id);
-          el('rooms').appendChild(row);
+            <span class="val">${fmt(s.value)}</span>`;
+          row.querySelector("input").checked = chosen.has(s.id);
+          box.appendChild(row);
         });
+      }
+      const picked = (id) => [...document.querySelectorAll(`#${id} input:checked`)].map((i) => i.value);
+
+      (async () => {
+        const [sensors, switches, rooms, outdoor, valves] = await Promise.all([
+          api("/sensors"), api("/switches"), get("roomSensors"), get("outdoorSource"), get("valves")]);
+        const sel = el("outdoor");
+        sel.add(new Option(Homey.__("settings.weather"), "weather"));
+        sel.add(new Option(Homey.__("settings.none"), "none"));
+        sensors.forEach((s) => sel.add(new Option(`${s.zone ? `${s.zone} / ` : ""}${s.name} (${s.value ?? "—"} °C)`, s.id)));
+        sel.value = outdoor || "weather";
+        checklist(el("rooms"), sensors, new Set(rooms || []), (v) => `${v ?? "—"} °C`);
+        checklist(el("valves"), switches, new Set(valves || []), (v) => (v ? Homey.__("settings.on") : Homey.__("settings.off")));
         Homey.ready();
         preview();
-      })().catch((e) => { el('rooms').textContent = `Error: ${e.message || e}`; Homey.ready(); });
+      })().catch((e) => { el("rooms").textContent = `Error: ${e.message || e}`; Homey.ready(); });
 
-      el('save').addEventListener('click', async () => {
-        const ids = [...document.querySelectorAll('#rooms input:checked')].map((i) => i.value);
-        await set('roomSensors', ids);
-        await set('outdoorSource', el('outdoor').value);
-        Homey.alert(Homey.__('settings.saved'));
+      el("save").addEventListener("click", async () => {
+        await set("roomSensors", picked("rooms"));
+        await set("valves", picked("valves"));
+        await set("outdoorSource", el("outdoor").value);
+        Homey.alert(Homey.__("settings.saved"));
         preview();
       });
     }
