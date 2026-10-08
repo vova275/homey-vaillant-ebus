@@ -2,10 +2,16 @@
 
 const Homey = require('homey');
 const { Boiler } = require('../../lib/boiler');
+const heating = require('../../lib/heating');
+const { describe } = require('../../lib/fcodes');
 
-// Panel and bus share one setpoint (d.05): whichever changed last wins. While
-// Homey is in control it re-sends its setpoint every refresh interval; when it
-// is not, the target capabilities just mirror what the boiler currently uses.
+// While "Controlled by Homey" is on, this device acts as the boiler's room
+// controller: every control interval it computes a flow setpoint (manual,
+// or heating curve + room correction) and sends SetMode, like a VRC does.
+// While it is off, Homey only reads, and the flow setpoint shows what the
+// boiler currently uses.
+
+const MODES = ['comfort', 'eco', 'away', 'boost', 'off'];
 
 class BoilerDevice extends Homey.Device {
   async onInit() {
@@ -13,29 +19,45 @@ class BoilerDevice extends Homey.Device {
     this.pollTimer = null;
     this.controlTimer = null;
     this.failures = 0;
+    this.lastPoll = 0;
 
-    if (!this.hasCapability('bus_control')) await this.addCapability('bus_control');
+    await this._migrate();
 
     const listen = (cap, fn) => this.registerCapabilityListener(cap, (v) => {
       this.log(`${cap} -> ${v} (from Homey)`);
       return fn(v);
     });
-    listen('target_temperature', (v) => this.setTarget('flow', v));
-    listen('target_temperature.hwc', (v) => this.setTarget('hwc', v));
-    listen('onoff', (v) => this.setHeating(v));
+    listen('target_temperature', (v) => this.setRoomTarget(v));
+    listen('target_temperature.flow', (v) => this.setManualFlow(v));
+    listen('target_temperature.hwc', (v) => this.setHwcTarget(v));
+    listen('heating_mode', (v) => this.setMode(v));
     listen('bus_control', (v) => this.setBusControl(v));
 
-    // restore what Homey last asked for
-    this.targets = {
+    this.ctl = this.getStoreValue('ctl') || {};
+    this._t = {
+      room: this.getStoreValue('room') ?? 21,
       flow: this.getStoreValue('flow') ?? 40,
       hwc: this.getStoreValue('hwc') ?? 50,
-      heating: this.getStoreValue('heating') ?? true,
+      mode: this.getStoreValue('mode') ?? 'comfort',
       control: this.getStoreValue('control') ?? false,
+      gas: this.getStoreValue('gas') ?? 0,
     };
     await this._show();
-
     this._connect();
   }
+
+  /** Bring a device paired with an older version to the current capability list. */
+  async _migrate() {
+    const want = this.driver.manifest.capabilities;
+    for (const c of this.getCapabilities()) {
+      if (!want.includes(c)) await this.removeCapability(c).catch(this.error);
+    }
+    for (const c of want) {
+      if (!this.hasCapability(c)) await this.addCapability(c).catch(this.error);
+    }
+  }
+
+  get app() { return this.homey.app; }
 
   _connect() {
     if (this.boiler) this.boiler.close();
@@ -55,17 +77,30 @@ class BoilerDevice extends Homey.Device {
     this.homey.clearInterval(this.controlTimer);
     const s = this.getSettings();
     this.pollTimer = this.homey.setInterval(() => this.poll(), s.poll_interval * 1000);
-    this.controlTimer = this.homey.setInterval(() => this._refresh(), s.control_interval * 1000);
+    this.controlTimer = this.homey.setInterval(() => this.control(), s.control_interval * 1000);
     this.poll();
   }
 
-  async _show() {
-    const set = (c, v) => this.hasCapability(c) && this.setCapabilityValue(c, v).catch(this.error);
-    await set('target_temperature', this.targets.flow);
-    await set('target_temperature.hwc', this.targets.hwc);
-    await set('onoff', this.targets.heating);
-    await set('bus_control', this.targets.control);
+  async _set(cap, v) {
+    if (v === undefined || !this.hasCapability(cap)) return;
+    if (this.getCapabilityValue(cap) !== v) await this.setCapabilityValue(cap, v).catch(this.error);
   }
+
+  async _save() {
+    for (const [k, v] of Object.entries(this._t)) await this.setStoreValue(k, v);
+    await this.setStoreValue('ctl', this.ctl);
+  }
+
+  async _show() {
+    await this._set('target_temperature', this._t.room);
+    await this._set('target_temperature.flow', this._t.flow);
+    await this._set('target_temperature.hwc', this._t.hwc);
+    await this._set('heating_mode', this._t.mode);
+    await this._set('bus_control', this._t.control);
+    await this._set('meter_gas', Math.round(this._t.gas * 1000) / 1000);
+  }
+
+  // ---------- reading ----------
 
   async poll() {
     if (this.polling) return;
@@ -83,100 +118,200 @@ class BoilerDevice extends Homey.Device {
     } finally {
       this.polling = false;
     }
+    await this._readSensors();
+  }
+
+  async _readSensors() {
+    try {
+      const [room, outdoor] = await Promise.all([this.app.sensors.room(), this.app.sensors.outdoor()]);
+      this.room = room;
+      this.outdoor = outdoor;
+      await this._set('measure_temperature', room);
+      await this._set('measure_temperature.outdoor', outdoor);
+    } catch (err) {
+      this.log('sensors:', err.message);
+    }
   }
 
   async _apply(st) {
-    const upd = async (cap, v) => {
-      if (v === undefined || !this.hasCapability(cap)) return;
-      if (this.getCapabilityValue(cap) !== v) await this.setCapabilityValue(cap, v).catch(this.error);
+    const s = this.getSettings();
+    const prev = {
+      flame: this.getCapabilityValue('flame_on'),
+      pressure: this.getCapabilityValue('measure_water_pressure'),
+      error: this.getCapabilityValue('boiler_error'),
+      lowP: this.getCapabilityValue('alarm_water_pressure'),
     };
-    const prevFlame = this.getCapabilityValue('flame_on');
-    const prevPressure = this.getCapabilityValue('measure_water_pressure');
-    const prevError = this.getCapabilityValue('boiler_error');
 
-    await upd('measure_temperature', st.flowTemp);
-    await upd('measure_temperature.return', st.returnTemp);
-    await upd('measure_temperature.hwc', st.hwcTemp);
-    await upd('measure_water_pressure', st.pressure);
-    await upd('measure_modulation', st.modulation);
-    await upd('flame_on', st.flame);
-    await upd('hwc_demand', st.hwcDemand);
+    await this._set('measure_temperature.flow', st.flowTemp);
+    await this._set('measure_temperature.return', st.returnTemp);
+    await this._set('measure_temperature.hwc', st.hwcTemp);
+    await this._set('measure_water_pressure', st.pressure);
+    await this._set('measure_modulation', st.modulation);
+    await this._set('flame_on', st.flame);
+    await this._set('hwc_demand', st.hwcDemand);
 
+    // gas estimate, integrated between polls (a gap longer than 5 min is not counted)
+    const now = Date.now();
+    const dt = this.lastPoll ? now - this.lastPoll : 0;
+    this.lastPoll = now;
+    if (st.flame !== undefined) {
+      const g = heating.gasUsed(
+        { flame: st.flame, modulation: st.modulation, dtMs: dt <= 300e3 ? dt : 0 },
+        { maxKw: s.max_kw, minKw: s.min_kw, kwhPerM3: s.kwh_per_m3, efficiency: s.efficiency / 100 },
+      );
+      await this._set('measure_heat_power', Math.round(g.kw * 10) / 10);
+      if (g.m3 > 0) {
+        this._t.gas += g.m3;
+        await this._set('meter_gas', Math.round(this._t.gas * 1000) / 1000);
+        await this.setStoreValue('gas', this._t.gas);
+      }
+    }
+
+    // faults
     if (st.errors !== undefined) {
-      const text = st.errors.length ? st.errors.map((e) => `F.${String(e).padStart(2, '0')}`).join(', ') : 'OK';
-      await upd('boiler_error', text);
-      await upd('alarm_generic', st.errors.length > 0);
-      if (prevError != null && prevError !== text) {
+      const text = st.errors.length ? st.errors.map(describe).join(', ') : 'OK';
+      await this._set('boiler_error', text);
+      await this._set('alarm_generic', st.errors.length > 0);
+      if (prev.error != null && prev.error !== text) {
         this.driver.errorChanged.trigger(this, { error: text, active: st.errors.length > 0 }).catch(this.error);
       }
     }
-    if (st.flame !== undefined && prevFlame != null && prevFlame !== st.flame) {
+    if (st.flame !== undefined && prev.flame != null && prev.flame !== st.flame) {
       (st.flame ? this.driver.flameOn : this.driver.flameOff).trigger(this).catch(this.error);
     }
-    if (st.pressure != null && prevPressure != null && Math.abs(prevPressure - st.pressure) >= 0.05) {
-      this.driver.pressureChanged.trigger(this, { pressure: st.pressure }).catch(this.error);
+
+    // pressure: change trigger plus a low-pressure alarm with 0.1 bar hysteresis
+    if (st.pressure != null) {
+      if (prev.pressure != null && Math.abs(prev.pressure - st.pressure) >= 0.05) {
+        this.driver.pressureChanged.trigger(this, { pressure: st.pressure }).catch(this.error);
+      }
+      const low = prev.lowP ? st.pressure < s.pressure_min + 0.1 : st.pressure < s.pressure_min;
+      if (low !== !!prev.lowP) {
+        await this._set('alarm_water_pressure', low);
+        (low ? this.driver.pressureLow : this.driver.pressureOk).trigger(this, { pressure: st.pressure }).catch(this.error);
+      }
     }
 
-    // not in control: show the setpoints the boiler actually uses (panel or last bus value)
-    if (!this.targets.control) {
-      if (st.flowTempDesired >= 20) { this.targets.flow = st.flowTempDesired; await upd('target_temperature', st.flowTempDesired); }
-      if (st.hwcTempDesired >= 30) { this.targets.hwc = st.hwcTempDesired; await upd('target_temperature.hwc', st.hwcTempDesired); }
+    if (!this._t.control && st.flowTempDesired >= 20) {
+      this._t.flow = st.flowTempDesired;
+      await this._set('target_temperature.flow', st.flowTempDesired);
+    }
+    if (!this._t.control && st.hwcTempDesired >= 30) {
+      this._t.hwc = st.hwcTempDesired;
+      await this._set('target_temperature.hwc', st.hwcTempDesired);
     }
   }
 
-  async _save() {
-    for (const [k, v] of Object.entries(this.targets)) await this.setStoreValue(k, v);
-  }
+  // ---------- control ----------
 
-  async _send(values) {
-    await this.boiler.setMode(values);
-    this.log('SetMode', JSON.stringify(values));
-  }
+  async control() {
+    if (!this._t.control) return;
+    const s = this.getSettings();
 
-  async _refresh() {
-    if (!this.targets.control) return;
+    if (this._t.mode === 'boost' && this.ctl.boostUntil && Date.now() > this.ctl.boostUntil) {
+      await this.setMode(this.ctl.beforeBoost || 'comfort');
+      return;
+    }
+
+    const r = heating.step({
+      mode: this._t.mode,
+      regulation: s.regulation,
+      manualFlow: this._t.flow,
+      room: this.room ?? null,
+      outdoor: this.outdoor ?? null,
+    }, {
+      comfort: this._t.room,
+      ecoDelta: s.eco_delta,
+      away: s.away_temp,
+      slope: s.curve_slope,
+      shift: s.curve_shift,
+      minFlow: s.min_flow,
+      maxFlow: s.max_flow,
+      heatingLimit: s.heating_limit,
+      roomGain: s.room_gain,
+      roomIntegral: s.room_integral,
+      roomHyst: s.room_hyst,
+      boostFlow: s.boost_flow,
+    }, this.ctl.pid);
+    this.ctl.pid = r.state;
+    await this.setStoreValue('ctl', this.ctl);
+
+    if (s.regulation !== 'manual' || this._t.mode === 'boost') await this._set('target_temperature.flow', r.flow);
+    await this._set('heating_active', r.heating);
+    if (r.reason !== this.lastReason) { this.log('control:', r.reason, '->', r.flow, r.heating ? 'heat' : 'no heat'); this.lastReason = r.reason; }
+
     try {
-      await this._send({
-        flowTemp: this.targets.flow,
-        hwcTemp: this.targets.hwc,
-        disableHc: !this.targets.heating,
-      });
+      await this.boiler.setMode({ flowTemp: r.flow, hwcTemp: this._t.hwc, disableHc: !r.heating });
     } catch (err) {
       this.log('SetMode failed:', err.message);
     }
   }
 
-  async setTarget(which, value) {
-    this.targets[which] = value;
-    this.targets.control = true;
+  async _takeControl() {
+    this._t.control = true;
     await this._save();
     await this._show();
-    await this._refresh();
+    await this.control();
   }
 
-  async setHeating(on) {
-    this.targets.heating = on;
-    this.targets.control = true;
-    await this._save();
-    await this._show();
-    await this._refresh();
+  async setRoomTarget(v) {
+    this._t.room = v;
+    if (this._t.mode !== 'comfort' && this._t.mode !== 'boost') this._t.mode = 'comfort';
+    await this._takeControl();
+  }
+
+  async setManualFlow(v) {
+    this._t.flow = v;
+    if (this.getSetting('regulation') !== 'manual') await this.setSettings({ regulation: 'manual' });
+    await this._takeControl();
+  }
+
+  async setHwcTarget(v) {
+    this._t.hwc = v;
+    await this._takeControl();
+  }
+
+  async setMode(mode, minutes) {
+    if (!MODES.includes(mode)) throw new Error(`unknown mode ${mode}`);
+    const prev = this._t.mode;
+    if (mode === 'boost') {
+      if (prev !== 'boost') this.ctl.beforeBoost = prev;
+      this.ctl.boostUntil = Date.now() + (minutes || this.getSetting('boost_minutes')) * 60e3;
+    }
+    this._t.mode = mode;
+    if (prev !== mode) this.driver.modeChanged.trigger(this, { mode }).catch(this.error);
+    await this._takeControl();
+  }
+
+  async setRegulation(regulation) {
+    await this.setSettings({ regulation });
+    this.ctl.pid = {};
+    await this._takeControl();
   }
 
   async setBusControl(on) {
-    this.targets.control = on;
+    this._t.control = on;
     await this._save();
     await this._show();
-    // off: just stop re-sending; the panel takes over with its next change
-    if (on) await this._refresh();
+    // off: just stop re-sending; the boiler keeps the last value until its panel is used
+    if (on) await this.control();
+    else await this._set('heating_active', null);
     this.homey.setTimeout(() => this.poll(), 3000);
   }
 
-  async onSettings({ changedKeys }) {
+  async resetGas(value = 0) {
+    this._t.gas = value;
+    await this._save();
+    await this._show();
+  }
+
+  async onSettings({ newSettings, changedKeys }) {
     if (changedKeys.some((k) => ['transport', 'host', 'port', 'address'].includes(k))) {
       this.homey.setTimeout(() => this._connect(), 500);
     } else if (changedKeys.some((k) => k.endsWith('_interval'))) {
       this.homey.setTimeout(() => this._schedule(), 500);
     }
+    if (changedKeys.includes('regulation') && newSettings.regulation !== 'manual') this.ctl.pid = {};
   }
 
   async onDeleted() {

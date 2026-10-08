@@ -1,6 +1,6 @@
 {
   "id": "ua.te.its.vaillantebus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "compatibility": ">=12.0.0",
   "sdk": 3,
   "platforms": [
@@ -16,7 +16,10 @@
     "climate"
   ],
   "brandColor": "#00917E",
-  "permissions": [],
+  "permissions": [
+    "homey:manager:api",
+    "homey:manager:geolocation"
+  ],
   "images": {
     "small": "/assets/images/small.png",
     "large": "/assets/images/large.png"
@@ -99,7 +102,7 @@
       "insights": false,
       "icon": "/assets/capabilities/control.svg",
       "desc": {
-        "en": "On: Homey re-sends its setpoints every minute and overrides the boiler panel. Off: the boiler panel is in charge."
+        "en": "On: Homey acts as the room controller and re-sends its setpoint every minute (overrides the boiler panel). Off: Homey only reads."
       }
     },
     "boiler_error": {
@@ -111,6 +114,85 @@
       "setable": false,
       "uiComponent": "sensor",
       "icon": "/assets/capabilities/error.svg"
+    },
+    "heating_mode": {
+      "type": "enum",
+      "title": {
+        "en": "Mode"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "values": [
+        {
+          "id": "comfort",
+          "title": {
+            "en": "Comfort"
+          }
+        },
+        {
+          "id": "eco",
+          "title": {
+            "en": "Eco"
+          }
+        },
+        {
+          "id": "away",
+          "title": {
+            "en": "Away (frost protection)"
+          }
+        },
+        {
+          "id": "boost",
+          "title": {
+            "en": "Boost"
+          }
+        },
+        {
+          "id": "off",
+          "title": {
+            "en": "Heating off"
+          }
+        }
+      ],
+      "icon": "/assets/capabilities/control.svg"
+    },
+    "heating_active": {
+      "type": "boolean",
+      "title": {
+        "en": "Heating requested"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/capabilities/flame.svg"
+    },
+    "alarm_water_pressure": {
+      "type": "boolean",
+      "title": {
+        "en": "Low water pressure"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/capabilities/pressure.svg"
+    },
+    "measure_heat_power": {
+      "type": "number",
+      "title": {
+        "en": "Heat output (estimated)"
+      },
+      "units": {
+        "en": "kW"
+      },
+      "decimals": 1,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/capabilities/modulation.svg"
     }
   },
   "drivers": [
@@ -129,20 +211,40 @@
       "capabilities": [
         "target_temperature",
         "measure_temperature",
+        "heating_mode",
+        "bus_control",
+        "heating_active",
+        "target_temperature.flow",
+        "measure_temperature.flow",
         "measure_temperature.return",
-        "measure_temperature.hwc",
+        "measure_temperature.outdoor",
         "target_temperature.hwc",
+        "measure_temperature.hwc",
+        "hwc_demand",
         "measure_water_pressure",
+        "alarm_water_pressure",
         "flame_on",
         "measure_modulation",
-        "hwc_demand",
-        "onoff",
-        "bus_control",
+        "measure_heat_power",
+        "meter_gas",
         "alarm_generic",
         "boiler_error"
       ],
       "capabilitiesOptions": {
         "target_temperature": {
+          "title": {
+            "en": "Room target"
+          },
+          "min": 5,
+          "max": 30,
+          "step": 0.5
+        },
+        "measure_temperature": {
+          "title": {
+            "en": "Room temperature"
+          }
+        },
+        "target_temperature.flow": {
           "title": {
             "en": "Heating flow setpoint"
           },
@@ -150,14 +252,19 @@
           "max": 80,
           "step": 1
         },
-        "measure_temperature": {
+        "measure_temperature.flow": {
           "title": {
-            "en": "Flow temperature (boiler outlet)"
+            "en": "Flow temperature"
           }
         },
         "measure_temperature.return": {
           "title": {
             "en": "Return temperature"
+          }
+        },
+        "measure_temperature.outdoor": {
+          "title": {
+            "en": "Outdoor temperature"
           }
         },
         "measure_temperature.hwc": {
@@ -173,9 +280,9 @@
           "max": 65,
           "step": 1
         },
-        "onoff": {
+        "meter_gas": {
           "title": {
-            "en": "Heating"
+            "en": "Gas (estimated)"
           }
         },
         "alarm_generic": {
@@ -300,6 +407,309 @@
               }
             }
           ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Heating regulation"
+          },
+          "children": [
+            {
+              "id": "regulation",
+              "type": "dropdown",
+              "label": {
+                "en": "Regulation"
+              },
+              "value": "manual",
+              "values": [
+                {
+                  "id": "manual",
+                  "label": {
+                    "en": "Manual flow setpoint"
+                  }
+                },
+                {
+                  "id": "curve",
+                  "label": {
+                    "en": "Weather curve + room sensors"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room sensors chosen in the app settings."
+              }
+            },
+            {
+              "id": "curve_slope",
+              "type": "number",
+              "label": {
+                "en": "Curve slope"
+              },
+              "value": 1.2,
+              "min": 0.2,
+              "max": 3.5,
+              "hint": {
+                "en": "Floor heating 0.4–0.8, radiators 1.0–1.6, poorly insulated 1.6–2.2."
+              },
+              "step": 0.1
+            },
+            {
+              "id": "curve_shift",
+              "type": "number",
+              "label": {
+                "en": "Curve shift"
+              },
+              "value": 0,
+              "min": -15,
+              "max": 15,
+              "units": {
+                "en": "°C"
+              },
+              "hint": {
+                "en": "Moves the whole curve up or down."
+              },
+              "step": 0.5
+            },
+            {
+              "id": "min_flow",
+              "type": "number",
+              "label": {
+                "en": "Minimum flow temperature"
+              },
+              "value": 25,
+              "min": 15,
+              "max": 50,
+              "units": {
+                "en": "°C"
+              }
+            },
+            {
+              "id": "max_flow",
+              "type": "number",
+              "label": {
+                "en": "Maximum flow temperature"
+              },
+              "value": 65,
+              "min": 30,
+              "max": 85,
+              "units": {
+                "en": "°C"
+              }
+            },
+            {
+              "id": "heating_limit",
+              "type": "number",
+              "label": {
+                "en": "Summer cut-off (outdoor)"
+              },
+              "value": 18,
+              "min": 5,
+              "max": 30,
+              "units": {
+                "en": "°C"
+              },
+              "hint": {
+                "en": "No heating when it is this warm outside."
+              },
+              "step": 0.5
+            },
+            {
+              "id": "room_gain",
+              "type": "number",
+              "label": {
+                "en": "Room influence"
+              },
+              "value": 3,
+              "min": 0,
+              "max": 10,
+              "units": {
+                "en": "°C per K"
+              },
+              "hint": {
+                "en": "How many degrees of flow per degree the room is off target."
+              },
+              "step": 0.5
+            },
+            {
+              "id": "room_integral",
+              "type": "number",
+              "label": {
+                "en": "Room learning speed"
+              },
+              "value": 2,
+              "min": 0,
+              "max": 10,
+              "units": {
+                "en": "°C per K·h"
+              },
+              "hint": {
+                "en": "Slowly shifts the curve if the room stays too cold or too warm. 0 = off."
+              },
+              "step": 0.5
+            },
+            {
+              "id": "room_hyst",
+              "type": "number",
+              "label": {
+                "en": "Room overshoot before heating stops"
+              },
+              "value": 0.5,
+              "min": 0.1,
+              "max": 3,
+              "units": {
+                "en": "°C"
+              },
+              "step": 0.1
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Modes"
+          },
+          "children": [
+            {
+              "id": "eco_delta",
+              "type": "number",
+              "label": {
+                "en": "Eco: lower room target by"
+              },
+              "value": 3,
+              "min": 0.5,
+              "max": 10,
+              "units": {
+                "en": "°C"
+              },
+              "step": 0.5
+            },
+            {
+              "id": "away_temp",
+              "type": "number",
+              "label": {
+                "en": "Away: room temperature"
+              },
+              "value": 10,
+              "min": 5,
+              "max": 18,
+              "units": {
+                "en": "°C"
+              },
+              "step": 0.5
+            },
+            {
+              "id": "boost_flow",
+              "type": "number",
+              "label": {
+                "en": "Boost: flow temperature"
+              },
+              "value": 70,
+              "min": 40,
+              "max": 85,
+              "units": {
+                "en": "°C"
+              }
+            },
+            {
+              "id": "boost_minutes",
+              "type": "number",
+              "label": {
+                "en": "Boost: duration"
+              },
+              "value": 30,
+              "min": 5,
+              "max": 240,
+              "units": {
+                "en": "min"
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Alarms"
+          },
+          "children": [
+            {
+              "id": "pressure_min",
+              "type": "number",
+              "label": {
+                "en": "Low water pressure alarm below"
+              },
+              "value": 1,
+              "min": 0.3,
+              "max": 2.5,
+              "units": {
+                "en": "bar"
+              },
+              "step": 0.1
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Gas estimate"
+          },
+          "children": [
+            {
+              "id": "max_kw",
+              "type": "number",
+              "label": {
+                "en": "Nominal heat output"
+              },
+              "value": 24,
+              "min": 5,
+              "max": 100,
+              "units": {
+                "en": "kW"
+              },
+              "hint": {
+                "en": "From the type plate, e.g. VU 246 = 24 kW."
+              }
+            },
+            {
+              "id": "min_kw",
+              "type": "number",
+              "label": {
+                "en": "Minimum heat output"
+              },
+              "value": 8,
+              "min": 1,
+              "max": 30,
+              "units": {
+                "en": "kW"
+              }
+            },
+            {
+              "id": "kwh_per_m3",
+              "type": "number",
+              "label": {
+                "en": "Gas energy content"
+              },
+              "value": 9.5,
+              "min": 7,
+              "max": 12,
+              "units": {
+                "en": "kWh/m³"
+              },
+              "step": 0.1
+            },
+            {
+              "id": "efficiency",
+              "type": "number",
+              "label": {
+                "en": "Efficiency"
+              },
+              "value": 95,
+              "min": 70,
+              "max": 110,
+              "units": {
+                "en": "%"
+              }
+            }
+          ]
         }
       ]
     }
@@ -386,6 +796,75 @@
             "filter": "driver_id=boiler"
           }
         ]
+      },
+      {
+        "id": "pressure_low",
+        "title": {
+          "en": "Water pressure dropped below the alarm level"
+        },
+        "tokens": [
+          {
+            "name": "pressure",
+            "type": "number",
+            "title": {
+              "en": "Pressure (bar)"
+            },
+            "example": 0.9
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
+      },
+      {
+        "id": "pressure_ok",
+        "title": {
+          "en": "Water pressure back to normal"
+        },
+        "tokens": [
+          {
+            "name": "pressure",
+            "type": "number",
+            "title": {
+              "en": "Pressure (bar)"
+            },
+            "example": 1.5
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
+      },
+      {
+        "id": "mode_changed",
+        "title": {
+          "en": "Mode changed"
+        },
+        "tokens": [
+          {
+            "name": "mode",
+            "type": "string",
+            "title": {
+              "en": "Mode"
+            },
+            "example": "eco"
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          }
+        ]
       }
     ],
     "conditions": [
@@ -425,6 +904,71 @@
             "placeholder": {
               "en": "1.0"
             }
+          }
+        ]
+      },
+      {
+        "id": "mode_is",
+        "title": {
+          "en": "Mode !{{is|is not}}"
+        },
+        "titleFormatted": {
+          "en": "Mode !{{is|is not}} [[mode]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "comfort",
+                "label": {
+                  "en": "Comfort"
+                }
+              },
+              {
+                "id": "eco",
+                "label": {
+                  "en": "Eco"
+                }
+              },
+              {
+                "id": "away",
+                "label": {
+                  "en": "Away (frost protection)"
+                }
+              },
+              {
+                "id": "boost",
+                "label": {
+                  "en": "Boost"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "Heating off"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pressure_is_low",
+        "title": {
+          "en": "Water pressure !{{is|is not}} low"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
           }
         ]
       }
@@ -515,7 +1059,178 @@
             ]
           }
         ]
+      },
+      {
+        "id": "set_mode",
+        "title": {
+          "en": "Set mode"
+        },
+        "titleFormatted": {
+          "en": "Set mode to [[mode]]"
+        },
+        "hint": {
+          "en": "Also switches on control by Homey."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "comfort",
+                "label": {
+                  "en": "Comfort"
+                }
+              },
+              {
+                "id": "eco",
+                "label": {
+                  "en": "Eco"
+                }
+              },
+              {
+                "id": "away",
+                "label": {
+                  "en": "Away (frost protection)"
+                }
+              },
+              {
+                "id": "boost",
+                "label": {
+                  "en": "Boost"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "Heating off"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "boost_for",
+        "title": {
+          "en": "Boost heating"
+        },
+        "titleFormatted": {
+          "en": "Boost heating for [[minutes]] minutes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "min": 5,
+            "max": 240,
+            "step": 5
+          }
+        ]
+      },
+      {
+        "id": "set_room_temperature",
+        "title": {
+          "en": "Set room target"
+        },
+        "titleFormatted": {
+          "en": "Set room target to [[temperature]] °C"
+        },
+        "hint": {
+          "en": "Comfort target. Also switches on control by Homey."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "min": 5,
+            "max": 30,
+            "step": 0.5
+          }
+        ]
+      },
+      {
+        "id": "set_regulation",
+        "title": {
+          "en": "Set regulation"
+        },
+        "titleFormatted": {
+          "en": "Set regulation to [[regulation]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "regulation",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "manual",
+                "label": {
+                  "en": "manual flow setpoint"
+                }
+              },
+              {
+                "id": "curve",
+                "label": {
+                  "en": "weather curve + room"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "reset_gas",
+        "title": {
+          "en": "Reset gas counter"
+        },
+        "titleFormatted": {
+          "en": "Set gas counter to [[value]] m³"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "value",
+            "type": "number",
+            "min": 0,
+            "max": 10000000,
+            "step": 0.001
+          }
+        ]
       }
     ]
+  },
+  "api": {
+    "getSensors": {
+      "method": "GET",
+      "path": "/sensors"
+    },
+    "getPreview": {
+      "method": "GET",
+      "path": "/preview"
+    }
   }
 }

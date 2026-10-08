@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <style>
+    .row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; }
+    .row .name { flex: 1; }
+    .zone { color: #888; font-size: 12px; }
+    .val { color: #555; min-width: 56px; text-align: right; }
+    #preview { margin: 12px 0; font-weight: 600; }
+    .hint { color: #888; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header class="homey-header">
+    <h1 class="homey-title">Vaillant eBUS — temperature sources</h1>
+    <p class="homey-subtitle">Used by the heating curve and room correction (device setting “Regulation = Weather + room”).</p>
+  </header>
+
+  <fieldset class="homey-form-fieldset">
+    <legend class="homey-form-legend">Outdoor temperature</legend>
+    <select id="outdoor" class="homey-form-select"></select>
+    <p class="hint">“Weather” uses Open-Meteo for your Homey's location, refreshed every 15 minutes.</p>
+  </fieldset>
+
+  <fieldset class="homey-form-fieldset">
+    <legend class="homey-form-legend">Room sensors (average)</legend>
+    <div id="rooms">Loading…</div>
+  </fieldset>
+
+  <div id="preview"></div>
+  <button id="save" class="homey-button-primary-full">Save</button>
+
+  <script type="text/javascript">
+    function onHomeyReady(Homey) {
+      const el = (id) => document.getElementById(id);
+      const get = (k) => new Promise((res) => Homey.get(k, (e, v) => res(e ? null : v)));
+      const set = (k, v) => new Promise((res, rej) => Homey.set(k, v, (e) => (e ? rej(e) : res())));
+      const api = (path) => new Promise((res, rej) => Homey.api('GET', path, null, (e, v) => (e ? rej(e) : res(v))));
+
+      async function preview() {
+        try {
+          const p = await api('/preview');
+          el('preview').textContent = `Now: room ${p.room ?? '—'} °C, outdoor ${p.outdoor ?? '—'} °C`;
+        } catch (e) { el('preview').textContent = ''; }
+      }
+
+      (async () => {
+        const [sensors, rooms, outdoor] = await Promise.all([api('/sensors'), get('roomSensors'), get('outdoorSource')]);
+        const chosen = new Set(rooms || []);
+        const sel = el('outdoor');
+        sel.add(new Option('Weather (internet)', 'weather'));
+        sel.add(new Option('None', 'none'));
+        sensors.forEach((s) => sel.add(new Option(`${s.zone ? `${s.zone} / ` : ''}${s.name} (${s.value ?? '—'} °C)`, s.id)));
+        sel.value = outdoor || 'weather';
+
+        el('rooms').innerHTML = '';
+        if (!sensors.length) el('rooms').textContent = 'No temperature sensors found in Homey.';
+        sensors.forEach((s) => {
+          const row = document.createElement('label');
+          row.className = 'row';
+          row.innerHTML = `<input type="checkbox" class="homey-form-checkbox-input" value="${s.id}">
+            <span class="name">${s.name}<br><span class="zone">${s.zone}</span></span>
+            <span class="val">${s.value ?? '—'} °C</span>`;
+          row.querySelector('input').checked = chosen.has(s.id);
+          el('rooms').appendChild(row);
+        });
+        Homey.ready();
+        preview();
+      })().catch((e) => { el('rooms').textContent = `Error: ${e.message || e}`; Homey.ready(); });
+
+      el('save').addEventListener('click', async () => {
+        const ids = [...document.querySelectorAll('#rooms input:checked')].map((i) => i.value);
+        await set('roomSensors', ids);
+        await set('outdoorSource', el('outdoor').value);
+        Homey.alert('Saved');
+        preview();
+      });
+    }
+  </script>
+</body>
+</html>
