@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="13" y="4" width="22" height="40" rx="3" fill="none" stroke="#000" stroke-width="2"/><path d="M24 14c.8 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1.2-3.2 2-4.4.4 1.2 1.2 1.9 1.2 2.7.8-2.4.8-4.8.8-6.8z" fill="#000"/><path d="M18 38h12M19 32h2M27 32h2" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960">
+  <path fill-rule="evenodd" d="M330 70h300a70 70 0 0 1 70 70v620a70 70 0 0 1-70 70H330a70 70 0 0 1-70-70V140a70 70 0 0 1 70-70zm10 60a20 20 0 0 0-20 20v600a20 20 0 0 0 20 20h280a20 20 0 0 0 20-20V150a20 20 0 0 0-20-20z"/>
+  <path d="M480 220c22 50 86 76 86 150a86 86 0 0 1-172 0c0-38 22-62 40-84 6 20 19 32 19 46 16-42 27-76 27-112z"/>
+  <rect x="350" y="580" width="260" height="120" rx="24"/>
+  <rect x="340" y="830" width="44" height="90" rx="14"/>
+  <rect x="458" y="830" width="44" height="90" rx="14"/>
+  <rect x="576" y="830" width="44" height="90" rx="14"/>
+</svg>
