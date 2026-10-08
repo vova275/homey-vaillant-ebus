@@ -3,7 +3,8 @@
 <head>
   <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
   <style>
-    .row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; }
+    .row { display: flex !important; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #eee; cursor: pointer; }
+    .row .homey-form-checkbox-checkmark { flex: none; }
     .row .name { flex: 1; }
     .zone { color: #888; font-size: 12px; }
     .val { color: #555; min-width: 56px; text-align: right; }
@@ -59,9 +60,10 @@
         if (!sensors.length) el('rooms').textContent = Homey.__('settings.noSensors');
         sensors.forEach((s) => {
           const row = document.createElement('label');
-          row.className = 'row';
+          row.className = 'homey-form-checkbox row';
           row.innerHTML = `<input type="checkbox" class="homey-form-checkbox-input" value="${s.id}">
-            <span class="name">${s.name}<br><span class="zone">${s.zone}</span></span>
+            <span class="homey-form-checkbox-checkmark"></span>
+            <span class="homey-form-checkbox-text name">${s.name}<br><span class="zone">${s.zone}</span></span>
             <span class="val">${s.value ?? '—'} °C</span>`;
           row.querySelector('input').checked = chosen.has(s.id);
           el('rooms').appendChild(row);
