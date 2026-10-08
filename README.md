@@ -23,9 +23,8 @@ Flow cards: flame on/off, error changed, pressure changed; conditions flame is o
 
 * The boiler display keeps showing the **panel** setpoint. The value actually used is diagnostics **d.05** — that is what this app sets and reads.
 * The bus setpoint is **not** limited by the panel value (45 °C was accepted with the panel at 39 °C).
-* The boiler keeps the last bus setpoint for a long time without refresh (> 8 min observed) — until the panel is changed.
-* Panel and bus share one setpoint (d.05, also mirrored at register `03e8`): **whichever was changed last wins**. Turning the panel 38 → 37 moved d.05 to 37 after a bus value of 38; in an earlier test a panel change did not show up within ~1 min, so it may apply with a delay. While Homey is in control it re-sends its setpoint every refresh interval, which overrides panel changes.
-* There is no separate readable "panel" register: a register sweep (`tools/scan-registers.js`) found only d.05 and its mirror changing with the panel.
+* **A bus setpoint stays valid for about 15 minutes after the last SetMode.** While it is valid the panel is ignored; afterwards the boiler falls back to its panel value (observed: last bus command 21:12, panel value taken over at 21:27; panel changes made in between had no effect). While Homey is in control it re-sends every minute, so the panel has no say; switching control off hands the boiler back to its panel after ~15 min.
+* There is no readable "panel" register: a register sweep (`tools/scan-registers.js`) found only d.05 and its mirror `03e8`.
 
 ## Hardware
 
