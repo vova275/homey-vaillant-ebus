@@ -54,6 +54,7 @@ class BoilerDevice extends Homey.Device {
 
   /** Bring a device paired with an older version to the current capability list. */
   async _migrate() {
+    if (this.getClass() !== this.driver.manifest.class) await this.setClass(this.driver.manifest.class).catch(this.error);
     const want = this.driver.manifest.capabilities;
     for (const c of this.getCapabilities()) {
       if (!want.includes(c)) await this.removeCapability(c).catch(this.error);

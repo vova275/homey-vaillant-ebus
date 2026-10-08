@@ -249,7 +249,7 @@
         "ru": "Газовый котёл Vaillant",
         "uk": "Газовий котел Vaillant"
       },
-      "class": "thermostat",
+      "class": "boiler",
       "platforms": [
         "local"
       ],
