@@ -1,0 +1,65 @@
+<style>
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-weight: 600; margin-bottom: 4px; }
+  .field input, .field select { width: 100%; }
+  #result { margin-top: 12px; white-space: pre-wrap; font-size: 13px; }
+  .hint { color: #888; font-size: 12px; }
+</style>
+
+<header class="homey-header">
+  <h1 class="homey-title">Connect to eBUS</h1>
+  <p class="homey-subtitle">Where can Homey reach the boiler's bus?</p>
+</header>
+
+<form class="homey-form" onsubmit="return false;">
+  <div class="field">
+    <label for="transport">Connection type</label>
+    <select id="transport" class="homey-form-select">
+      <option value="ebusd">ebusd daemon (Raspberry Pi / PC)</option>
+      <option value="enhanced">eBUS adapter directly (v5 / v5-C6 / ESP, enhanced protocol)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="host">Host / IP address</label>
+    <input id="host" class="homey-form-input" type="text" placeholder="192.168.1.50">
+  </div>
+  <div class="field">
+    <label for="port">Port</label>
+    <input id="port" class="homey-form-input" type="number" value="8888">
+    <div class="hint">ebusd: 8888 (start it with --enablehex). v5-C6 adapter: 9999.</div>
+  </div>
+  <div class="field" id="addrField" style="display:none">
+    <label for="address">Own master address (hex)</label>
+    <input id="address" class="homey-form-input" type="text" value="31">
+  </div>
+  <button id="go" class="homey-button-primary-full">Connect</button>
+  <div id="result"></div>
+</form>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  $('transport').addEventListener('change', () => {
+    const enh = $('transport').value === 'enhanced';
+    $('port').value = enh ? 9999 : 8888;
+    $('addrField').style.display = enh ? '' : 'none';
+  });
+  $('go').addEventListener('click', async () => {
+    $('go').classList.add('is-loading');
+    $('result').textContent = '';
+    try {
+      const r = await Homey.emit('connect', {
+        transport: $('transport').value,
+        host: $('host').value.trim(),
+        port: $('port').value,
+        address: $('address').value.trim(),
+      });
+      $('result').textContent = `Found ${r.ident.manufacturer} ${r.ident.id} (SW ${r.ident.sw})\n`
+        + `Flow ${r.state.flowTemp} °C, pressure ${r.state.pressure} bar`;
+      setTimeout(() => Homey.showView('list_devices'), 1200);
+    } catch (err) {
+      $('result').textContent = `Failed: ${err.message || err}`;
+    } finally {
+      $('go').classList.remove('is-loading');
+    }
+  });
+</script>
