@@ -7,10 +7,14 @@
     "local"
   ],
   "name": {
-    "en": "Vaillant eBUS"
+    "en": "Vaillant eBUS",
+    "ru": "Vaillant eBUS",
+    "uk": "Vaillant eBUS"
   },
   "description": {
-    "en": "Local monitoring and control of Vaillant boilers over eBUS"
+    "en": "Local monitoring and control of Vaillant boilers over eBUS",
+    "ru": "Локальный мониторинг и управление котлами Vaillant через eBUS",
+    "uk": "Локальний моніторинг і керування котлами Vaillant через eBUS"
   },
   "category": [
     "climate"
@@ -36,10 +40,14 @@
     "measure_water_pressure": {
       "type": "number",
       "title": {
-        "en": "Water pressure"
+        "en": "Water pressure",
+        "ru": "Давление воды",
+        "uk": "Тиск води"
       },
       "units": {
-        "en": "bar"
+        "en": "bar",
+        "ru": "бар",
+        "uk": "бар"
       },
       "decimals": 2,
       "getable": true,
@@ -51,10 +59,14 @@
     "measure_modulation": {
       "type": "number",
       "title": {
-        "en": "Modulation"
+        "en": "Modulation",
+        "ru": "Модуляция",
+        "uk": "Модуляція"
       },
       "units": {
-        "en": "%"
+        "en": "%",
+        "ru": "%",
+        "uk": "%"
       },
       "decimals": 0,
       "getable": true,
@@ -66,24 +78,32 @@
     "flame_on": {
       "type": "boolean",
       "title": {
-        "en": "Flame"
+        "en": "Flame",
+        "ru": "Пламя",
+        "uk": "Полум'я"
       },
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
       "insights": true,
       "insightsTitleTrue": {
-        "en": "Flame on"
+        "en": "Flame on",
+        "ru": "Пламя есть",
+        "uk": "Полум'я є"
       },
       "insightsTitleFalse": {
-        "en": "Flame off"
+        "en": "Flame off",
+        "ru": "Пламени нет",
+        "uk": "Полум'я немає"
       },
       "icon": "/assets/capabilities/flame.svg"
     },
     "hwc_demand": {
       "type": "boolean",
       "title": {
-        "en": "Hot water demand"
+        "en": "Hot water demand",
+        "ru": "Запрос горячей воды",
+        "uk": "Запит гарячої води"
       },
       "getable": true,
       "setable": false,
@@ -94,7 +114,9 @@
     "bus_control": {
       "type": "boolean",
       "title": {
-        "en": "Controlled by Homey"
+        "en": "Controlled by Homey",
+        "ru": "Управление из Homey",
+        "uk": "Керування з Homey"
       },
       "getable": true,
       "setable": true,
@@ -102,13 +124,17 @@
       "insights": false,
       "icon": "/assets/capabilities/control.svg",
       "desc": {
-        "en": "On: Homey acts as the room controller and re-sends its setpoint every minute (overrides the boiler panel). Off: Homey only reads."
+        "en": "On: Homey acts as the room controller and re-sends its setpoint every minute (overrides the boiler panel). Off: Homey only reads.",
+        "ru": "Вкл.: Homey работает как комнатный регулятор и каждую минуту отправляет уставку (панель котла не действует). Выкл.: Homey только читает данные.",
+        "uk": "Увімк.: Homey працює як кімнатний регулятор і щохвилини надсилає уставку (панель котла не діє). Вимк.: Homey лише читає дані."
       }
     },
     "boiler_error": {
       "type": "string",
       "title": {
-        "en": "Error"
+        "en": "Error",
+        "ru": "Ошибка",
+        "uk": "Помилка"
       },
       "getable": true,
       "setable": false,
@@ -118,7 +144,9 @@
     "heating_mode": {
       "type": "enum",
       "title": {
-        "en": "Mode"
+        "en": "Mode",
+        "ru": "Режим",
+        "uk": "Режим"
       },
       "getable": true,
       "setable": true,
@@ -127,31 +155,41 @@
         {
           "id": "comfort",
           "title": {
-            "en": "Comfort"
+            "en": "Comfort",
+            "ru": "Комфорт",
+            "uk": "Комфорт"
           }
         },
         {
           "id": "eco",
           "title": {
-            "en": "Eco"
+            "en": "Eco",
+            "ru": "Эко",
+            "uk": "Еко"
           }
         },
         {
           "id": "away",
           "title": {
-            "en": "Away (frost protection)"
+            "en": "Away (frost protection)",
+            "ru": "Отъезд (защита от замерзания)",
+            "uk": "Від'їзд (захист від замерзання)"
           }
         },
         {
           "id": "boost",
           "title": {
-            "en": "Boost"
+            "en": "Boost",
+            "ru": "Буст",
+            "uk": "Буст"
           }
         },
         {
           "id": "off",
           "title": {
-            "en": "Heating off"
+            "en": "Heating off",
+            "ru": "Отопление выключено",
+            "uk": "Опалення вимкнено"
           }
         }
       ],
@@ -160,7 +198,9 @@
     "heating_active": {
       "type": "boolean",
       "title": {
-        "en": "Heating requested"
+        "en": "Heating requested",
+        "ru": "Запрос на отопление",
+        "uk": "Запит на опалення"
       },
       "getable": true,
       "setable": false,
@@ -171,7 +211,9 @@
     "alarm_water_pressure": {
       "type": "boolean",
       "title": {
-        "en": "Low water pressure"
+        "en": "Low water pressure",
+        "ru": "Низкое давление воды",
+        "uk": "Низький тиск води"
       },
       "getable": true,
       "setable": false,
@@ -182,10 +224,14 @@
     "measure_heat_power": {
       "type": "number",
       "title": {
-        "en": "Heat output (estimated)"
+        "en": "Heat output (estimated)",
+        "ru": "Тепловая мощность (оценка)",
+        "uk": "Теплова потужність (оцінка)"
       },
       "units": {
-        "en": "kW"
+        "en": "kW",
+        "ru": "кВт",
+        "uk": "кВт"
       },
       "decimals": 1,
       "getable": true,
@@ -199,7 +245,9 @@
     {
       "id": "boiler",
       "name": {
-        "en": "Vaillant gas boiler"
+        "en": "Vaillant gas boiler",
+        "ru": "Газовый котёл Vaillant",
+        "uk": "Газовий котел Vaillant"
       },
       "class": "thermostat",
       "platforms": [
@@ -233,7 +281,9 @@
       "capabilitiesOptions": {
         "target_temperature": {
           "title": {
-            "en": "Room target"
+            "en": "Room target",
+            "ru": "Желаемая в комнате",
+            "uk": "Бажана в кімнаті"
           },
           "min": 5,
           "max": 30,
@@ -241,12 +291,16 @@
         },
         "measure_temperature": {
           "title": {
-            "en": "Room temperature"
+            "en": "Room temperature",
+            "ru": "Температура в комнате",
+            "uk": "Температура в кімнаті"
           }
         },
         "target_temperature.flow": {
           "title": {
-            "en": "Heating flow setpoint"
+            "en": "Heating flow setpoint",
+            "ru": "Уставка подачи отопления",
+            "uk": "Уставка подачі опалення"
           },
           "min": 20,
           "max": 80,
@@ -254,27 +308,37 @@
         },
         "measure_temperature.flow": {
           "title": {
-            "en": "Flow temperature"
+            "en": "Flow temperature",
+            "ru": "Температура подачи",
+            "uk": "Температура подачі"
           }
         },
         "measure_temperature.return": {
           "title": {
-            "en": "Return temperature"
+            "en": "Return temperature",
+            "ru": "Температура обратки",
+            "uk": "Температура зворотки"
           }
         },
         "measure_temperature.outdoor": {
           "title": {
-            "en": "Outdoor temperature"
+            "en": "Outdoor temperature",
+            "ru": "Температура на улице",
+            "uk": "Температура на вулиці"
           }
         },
         "measure_temperature.hwc": {
           "title": {
-            "en": "Hot water temperature"
+            "en": "Hot water temperature",
+            "ru": "Температура горячей воды",
+            "uk": "Температура гарячої води"
           }
         },
         "target_temperature.hwc": {
           "title": {
-            "en": "Hot water setpoint"
+            "en": "Hot water setpoint",
+            "ru": "Уставка горячей воды",
+            "uk": "Уставка гарячої води"
           },
           "min": 35,
           "max": 65,
@@ -282,12 +346,16 @@
         },
         "meter_gas": {
           "title": {
-            "en": "Gas (estimated)"
+            "en": "Gas (estimated)",
+            "ru": "Газ (оценка)",
+            "uk": "Газ (оцінка)"
           }
         },
         "alarm_generic": {
           "title": {
-            "en": "Boiler fault"
+            "en": "Boiler fault",
+            "ru": "Неисправность котла",
+            "uk": "Несправність котла"
           }
         }
       },
@@ -315,27 +383,35 @@
         {
           "type": "group",
           "label": {
-            "en": "Connection"
+            "en": "Connection",
+            "ru": "Подключение",
+            "uk": "Підключення"
           },
           "children": [
             {
               "id": "transport",
               "type": "dropdown",
               "label": {
-                "en": "Connection type"
+                "en": "Connection type",
+                "ru": "Тип подключения",
+                "uk": "Тип підключення"
               },
               "value": "ebusd",
               "values": [
                 {
                   "id": "ebusd",
                   "label": {
-                    "en": "ebusd daemon (TCP 8888, needs --enablehex)"
+                    "en": "ebusd daemon (TCP 8888, needs --enablehex)",
+                    "ru": "Сервис ebusd (TCP 8888, нужен --enablehex)",
+                    "uk": "Сервіс ebusd (TCP 8888, потрібен --enablehex)"
                   }
                 },
                 {
                   "id": "enhanced",
                   "label": {
-                    "en": "Adapter, enhanced protocol (v5/v5-C6/ESP)"
+                    "en": "Adapter, enhanced protocol (v5/v5-C6/ESP)",
+                    "ru": "Адаптер, enhanced-протокол (v5/C5/C6/ESP)",
+                    "uk": "Адаптер, enhanced-протокол (v5/C5/C6/ESP)"
                   }
                 }
               ]
@@ -344,7 +420,9 @@
               "id": "host",
               "type": "text",
               "label": {
-                "en": "Host / IP"
+                "en": "Host / IP",
+                "ru": "Хост / IP",
+                "uk": "Хост / IP"
               },
               "value": ""
             },
@@ -352,7 +430,9 @@
               "id": "port",
               "type": "number",
               "label": {
-                "en": "Port"
+                "en": "Port",
+                "ru": "Порт",
+                "uk": "Порт"
               },
               "value": 8888,
               "min": 1,
@@ -362,11 +442,15 @@
               "id": "address",
               "type": "text",
               "label": {
-                "en": "Own master address (hex, enhanced only)"
+                "en": "Own master address (hex, enhanced only)",
+                "ru": "Свой адрес мастера (hex, только для адаптера)",
+                "uk": "Власна адреса майстра (hex, лише для адаптера)"
               },
               "value": "31",
               "hint": {
-                "en": "Must be a free eBUS master address. 31 is ebusd's default; do not use 10 if a Vaillant controller is on the bus."
+                "en": "Must be a free eBUS master address. 31 is ebusd's default; do not use 10 if a Vaillant controller is on the bus.",
+                "ru": "Должен быть свободный адрес мастера eBUS. 31 — по умолчанию в ebusd; не используйте 10, если на шине есть регулятор Vaillant.",
+                "uk": "Має бути вільна адреса майстра eBUS. 31 — типова в ebusd; не використовуйте 10, якщо на шині є регулятор Vaillant."
               }
             }
           ]
@@ -374,17 +458,23 @@
         {
           "type": "group",
           "label": {
-            "en": "Timing"
+            "en": "Timing",
+            "ru": "Интервалы",
+            "uk": "Інтервали"
           },
           "children": [
             {
               "id": "poll_interval",
               "type": "number",
               "label": {
-                "en": "Poll interval"
+                "en": "Poll interval",
+                "ru": "Интервал опроса",
+                "uk": "Інтервал опитування"
               },
               "units": {
-                "en": "s"
+                "en": "s",
+                "ru": "с",
+                "uk": "с"
               },
               "value": 15,
               "min": 5,
@@ -394,16 +484,22 @@
               "id": "control_interval",
               "type": "number",
               "label": {
-                "en": "Setpoint refresh interval"
+                "en": "Setpoint refresh interval",
+                "ru": "Интервал отправки уставки",
+                "uk": "Інтервал надсилання уставки"
               },
               "units": {
-                "en": "s"
+                "en": "s",
+                "ru": "с",
+                "uk": "с"
               },
               "value": 60,
               "min": 15,
               "max": 600,
               "hint": {
-                "en": "How often the setpoint is re-sent while Homey controls the boiler, like a room controller does."
+                "en": "How often the setpoint is re-sent while Homey controls the boiler, like a room controller does.",
+                "ru": "Как часто уставка отправляется повторно, пока Homey управляет котлом (как это делает комнатный регулятор).",
+                "uk": "Як часто уставка надсилається повторно, поки Homey керує котлом (як це робить кімнатний регулятор)."
               }
             }
           ]
@@ -411,45 +507,59 @@
         {
           "type": "group",
           "label": {
-            "en": "Heating regulation"
+            "en": "Heating regulation",
+            "ru": "Регулирование отопления",
+            "uk": "Регулювання опалення"
           },
           "children": [
             {
               "id": "regulation",
               "type": "dropdown",
               "label": {
-                "en": "Regulation"
+                "en": "Regulation",
+                "ru": "Регулирование",
+                "uk": "Регулювання"
               },
               "value": "manual",
               "values": [
                 {
                   "id": "manual",
                   "label": {
-                    "en": "Manual flow setpoint"
+                    "en": "Manual flow setpoint",
+                    "ru": "Ручная уставка подачи",
+                    "uk": "Ручна уставка подачі"
                   }
                 },
                 {
                   "id": "curve",
                   "label": {
-                    "en": "Weather curve + room sensors"
+                    "en": "Weather curve + room sensors",
+                    "ru": "Погодная кривая + комнатные датчики",
+                    "uk": "Погодна крива + кімнатні датчики"
                   }
                 }
               ],
               "hint": {
-                "en": "Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room sensors chosen in the app settings."
+                "en": "Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room sensors chosen in the app settings.",
+                "ru": "Погодная кривая: уставка подачи зависит от уличной температуры и корректируется комнатными датчиками, выбранными в настройках приложения.",
+                "uk": "Погодна крива: уставка подачі залежить від вуличної температури й коригується кімнатними датчиками, вибраними в налаштуваннях застосунку."
               }
             },
             {
               "id": "curve_slope",
               "type": "number",
               "label": {
-                "en": "Curve slope"
+                "en": "Curve slope",
+                "ru": "Наклон кривой",
+                "uk": "Нахил кривої"
               },
               "value": 1.2,
               "min": 0.2,
               "max": 3.5,
               "hint": {
-                "en": "Floor heating 0.4–0.8, radiators 1.0–1.6, poorly insulated 1.6–2.2."
+                "en": "Floor heating 0.4–0.8, radiators 1.0–1.6, poorly insulated 1.6–2.2.",
+                "ru": "Тёплый пол 0,4–0,8, радиаторы 1,0–1,6, плохо утеплённый дом 1,6–2,2.",
+                "uk": "Тепла підлога 0,4–0,8, радіатори 1,0–1,6, погано утеплений будинок 1,6–2,2."
               },
               "step": 0.1
             },
@@ -457,16 +567,22 @@
               "id": "curve_shift",
               "type": "number",
               "label": {
-                "en": "Curve shift"
+                "en": "Curve shift",
+                "ru": "Сдвиг кривой",
+                "uk": "Зсув кривої"
               },
               "value": 0,
               "min": -15,
               "max": 15,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               },
               "hint": {
-                "en": "Moves the whole curve up or down."
+                "en": "Moves the whole curve up or down.",
+                "ru": "Сдвигает всю кривую вверх или вниз.",
+                "uk": "Зсуває всю криву вгору або вниз."
               },
               "step": 0.5
             },
@@ -474,42 +590,56 @@
               "id": "min_flow",
               "type": "number",
               "label": {
-                "en": "Minimum flow temperature"
+                "en": "Minimum flow temperature",
+                "ru": "Минимальная температура подачи",
+                "uk": "Мінімальна температура подачі"
               },
               "value": 25,
               "min": 15,
               "max": 50,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               }
             },
             {
               "id": "max_flow",
               "type": "number",
               "label": {
-                "en": "Maximum flow temperature"
+                "en": "Maximum flow temperature",
+                "ru": "Максимальная температура подачи",
+                "uk": "Максимальна температура подачі"
               },
               "value": 65,
               "min": 30,
               "max": 85,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               }
             },
             {
               "id": "heating_limit",
               "type": "number",
               "label": {
-                "en": "Summer cut-off (outdoor)"
+                "en": "Summer cut-off (outdoor)",
+                "ru": "Летнее отключение (улица)",
+                "uk": "Літнє вимкнення (вулиця)"
               },
               "value": 18,
               "min": 5,
               "max": 30,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               },
               "hint": {
-                "en": "No heating when it is this warm outside."
+                "en": "No heating when it is this warm outside.",
+                "ru": "Отопление не работает, если на улице так тепло.",
+                "uk": "Опалення не працює, якщо на вулиці так тепло."
               },
               "step": 0.5
             },
@@ -517,16 +647,22 @@
               "id": "room_gain",
               "type": "number",
               "label": {
-                "en": "Room influence"
+                "en": "Room influence",
+                "ru": "Влияние комнаты",
+                "uk": "Вплив кімнати"
               },
               "value": 3,
               "min": 0,
               "max": 10,
               "units": {
-                "en": "°C per K"
+                "en": "°C per K",
+                "ru": "°C на K",
+                "uk": "°C на K"
               },
               "hint": {
-                "en": "How many degrees of flow per degree the room is off target."
+                "en": "How many degrees of flow per degree the room is off target.",
+                "ru": "На сколько градусов меняется подача на каждый градус отклонения в комнате.",
+                "uk": "На скільки градусів змінюється подача на кожен градус відхилення в кімнаті."
               },
               "step": 0.5
             },
@@ -534,16 +670,22 @@
               "id": "room_integral",
               "type": "number",
               "label": {
-                "en": "Room learning speed"
+                "en": "Room learning speed",
+                "ru": "Скорость подстройки",
+                "uk": "Швидкість підлаштування"
               },
               "value": 2,
               "min": 0,
               "max": 10,
               "units": {
-                "en": "°C per K·h"
+                "en": "°C per K·h",
+                "ru": "°C на K·ч",
+                "uk": "°C на K·год"
               },
               "hint": {
-                "en": "Slowly shifts the curve if the room stays too cold or too warm. 0 = off."
+                "en": "Slowly shifts the curve if the room stays too cold or too warm. 0 = off.",
+                "ru": "Медленно сдвигает кривую, если в комнате постоянно холодно или жарко. 0 = выкл.",
+                "uk": "Повільно зсуває криву, якщо в кімнаті постійно холодно або спекотно. 0 = вимк."
               },
               "step": 0.5
             },
@@ -551,13 +693,17 @@
               "id": "room_hyst",
               "type": "number",
               "label": {
-                "en": "Room overshoot before heating stops"
+                "en": "Room overshoot before heating stops",
+                "ru": "Перегрев комнаты до отключения отопления",
+                "uk": "Перегрів кімнати до вимкнення опалення"
               },
               "value": 0.5,
               "min": 0.1,
               "max": 3,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               },
               "step": 0.1
             }
@@ -566,20 +712,26 @@
         {
           "type": "group",
           "label": {
-            "en": "Modes"
+            "en": "Modes",
+            "ru": "Режимы",
+            "uk": "Режими"
           },
           "children": [
             {
               "id": "eco_delta",
               "type": "number",
               "label": {
-                "en": "Eco: lower room target by"
+                "en": "Eco: lower room target by",
+                "ru": "Эко: понизить желаемую на",
+                "uk": "Еко: знизити бажану на"
               },
               "value": 3,
               "min": 0.5,
               "max": 10,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               },
               "step": 0.5
             },
@@ -587,13 +739,17 @@
               "id": "away_temp",
               "type": "number",
               "label": {
-                "en": "Away: room temperature"
+                "en": "Away: room temperature",
+                "ru": "Отъезд: температура в комнате",
+                "uk": "Від'їзд: температура в кімнаті"
               },
               "value": 10,
               "min": 5,
               "max": 18,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               },
               "step": 0.5
             },
@@ -601,26 +757,34 @@
               "id": "boost_flow",
               "type": "number",
               "label": {
-                "en": "Boost: flow temperature"
+                "en": "Boost: flow temperature",
+                "ru": "Буст: температура подачи",
+                "uk": "Буст: температура подачі"
               },
               "value": 70,
               "min": 40,
               "max": 85,
               "units": {
-                "en": "°C"
+                "en": "°C",
+                "ru": "°C",
+                "uk": "°C"
               }
             },
             {
               "id": "boost_minutes",
               "type": "number",
               "label": {
-                "en": "Boost: duration"
+                "en": "Boost: duration",
+                "ru": "Буст: длительность",
+                "uk": "Буст: тривалість"
               },
               "value": 30,
               "min": 5,
               "max": 240,
               "units": {
-                "en": "min"
+                "en": "min",
+                "ru": "мин",
+                "uk": "хв"
               }
             }
           ]
@@ -628,20 +792,26 @@
         {
           "type": "group",
           "label": {
-            "en": "Alarms"
+            "en": "Alarms",
+            "ru": "Тревоги",
+            "uk": "Тривоги"
           },
           "children": [
             {
               "id": "pressure_min",
               "type": "number",
               "label": {
-                "en": "Low water pressure alarm below"
+                "en": "Low water pressure alarm below",
+                "ru": "Тревога низкого давления ниже",
+                "uk": "Тривога низького тиску нижче"
               },
               "value": 1,
               "min": 0.3,
               "max": 2.5,
               "units": {
-                "en": "bar"
+                "en": "bar",
+                "ru": "бар",
+                "uk": "бар"
               },
               "step": 0.1
             }
@@ -650,49 +820,65 @@
         {
           "type": "group",
           "label": {
-            "en": "Gas estimate"
+            "en": "Gas estimate",
+            "ru": "Оценка расхода газа",
+            "uk": "Оцінка витрати газу"
           },
           "children": [
             {
               "id": "max_kw",
               "type": "number",
               "label": {
-                "en": "Nominal heat output"
+                "en": "Nominal heat output",
+                "ru": "Номинальная мощность",
+                "uk": "Номінальна потужність"
               },
               "value": 24,
               "min": 5,
               "max": 100,
               "units": {
-                "en": "kW"
+                "en": "kW",
+                "ru": "кВт",
+                "uk": "кВт"
               },
               "hint": {
-                "en": "From the type plate, e.g. VU 246 = 24 kW."
+                "en": "From the type plate, e.g. VU 246 = 24 kW.",
+                "ru": "С шильдика, например VU 246 = 24 кВт.",
+                "uk": "З таблички, наприклад VU 246 = 24 кВт."
               }
             },
             {
               "id": "min_kw",
               "type": "number",
               "label": {
-                "en": "Minimum heat output"
+                "en": "Minimum heat output",
+                "ru": "Минимальная мощность",
+                "uk": "Мінімальна потужність"
               },
               "value": 8,
               "min": 1,
               "max": 30,
               "units": {
-                "en": "kW"
+                "en": "kW",
+                "ru": "кВт",
+                "uk": "кВт"
               }
             },
             {
               "id": "kwh_per_m3",
               "type": "number",
               "label": {
-                "en": "Gas energy content"
+                "en": "Gas energy content",
+                "ru": "Теплотворность газа",
+                "uk": "Теплотворність газу"
               },
               "value": 9.5,
               "min": 7,
               "max": 12,
               "units": {
-                "en": "kWh/m³"
+                "en": "kWh/m³",
+                "ru": "кВт·ч/м³",
+                "uk": "кВт·год/м³"
               },
               "step": 0.1
             },
@@ -700,13 +886,17 @@
               "id": "efficiency",
               "type": "number",
               "label": {
-                "en": "Efficiency"
+                "en": "Efficiency",
+                "ru": "КПД",
+                "uk": "ККД"
               },
               "value": 95,
               "min": 70,
               "max": 110,
               "units": {
-                "en": "%"
+                "en": "%",
+                "ru": "%",
+                "uk": "%"
               }
             }
           ]
@@ -719,7 +909,9 @@
       {
         "id": "flame_on",
         "title": {
-          "en": "Flame turned on"
+          "en": "Flame turned on",
+          "ru": "Пламя зажглось",
+          "uk": "Полум'я запалилось"
         },
         "args": [
           {
@@ -732,7 +924,9 @@
       {
         "id": "flame_off",
         "title": {
-          "en": "Flame turned off"
+          "en": "Flame turned off",
+          "ru": "Пламя погасло",
+          "uk": "Полум'я згасло"
         },
         "args": [
           {
@@ -745,24 +939,32 @@
       {
         "id": "error_changed",
         "title": {
-          "en": "Boiler error changed"
+          "en": "Boiler error changed",
+          "ru": "Изменилась ошибка котла",
+          "uk": "Змінилась помилка котла"
         },
         "tokens": [
           {
             "name": "error",
             "type": "string",
             "title": {
-              "en": "Error"
+              "en": "Error",
+              "ru": "Ошибка",
+              "uk": "Помилка"
             },
             "example": {
-              "en": "F.28"
+              "en": "F.28",
+              "ru": "F.28",
+              "uk": "F.28"
             }
           },
           {
             "name": "active",
             "type": "boolean",
             "title": {
-              "en": "Fault active"
+              "en": "Fault active",
+              "ru": "Неисправность активна",
+              "uk": "Несправність активна"
             }
           }
         ],
@@ -777,14 +979,18 @@
       {
         "id": "pressure_changed",
         "title": {
-          "en": "Water pressure changed"
+          "en": "Water pressure changed",
+          "ru": "Изменилось давление воды",
+          "uk": "Змінився тиск води"
         },
         "tokens": [
           {
             "name": "pressure",
             "type": "number",
             "title": {
-              "en": "Pressure (bar)"
+              "en": "Pressure (bar)",
+              "ru": "Давление (бар)",
+              "uk": "Тиск (бар)"
             },
             "example": 1.6
           }
@@ -800,14 +1006,18 @@
       {
         "id": "pressure_low",
         "title": {
-          "en": "Water pressure dropped below the alarm level"
+          "en": "Water pressure dropped below the alarm level",
+          "ru": "Давление воды упало ниже порога тревоги",
+          "uk": "Тиск води впав нижче порогу тривоги"
         },
         "tokens": [
           {
             "name": "pressure",
             "type": "number",
             "title": {
-              "en": "Pressure (bar)"
+              "en": "Pressure (bar)",
+              "ru": "Давление (бар)",
+              "uk": "Тиск (бар)"
             },
             "example": 0.9
           }
@@ -823,14 +1033,18 @@
       {
         "id": "pressure_ok",
         "title": {
-          "en": "Water pressure back to normal"
+          "en": "Water pressure back to normal",
+          "ru": "Давление воды восстановилось",
+          "uk": "Тиск води відновився"
         },
         "tokens": [
           {
             "name": "pressure",
             "type": "number",
             "title": {
-              "en": "Pressure (bar)"
+              "en": "Pressure (bar)",
+              "ru": "Давление (бар)",
+              "uk": "Тиск (бар)"
             },
             "example": 1.5
           }
@@ -846,14 +1060,18 @@
       {
         "id": "mode_changed",
         "title": {
-          "en": "Mode changed"
+          "en": "Mode changed",
+          "ru": "Режим изменился",
+          "uk": "Режим змінився"
         },
         "tokens": [
           {
             "name": "mode",
             "type": "string",
             "title": {
-              "en": "Mode"
+              "en": "Mode",
+              "ru": "Режим",
+              "uk": "Режим"
             },
             "example": "eco"
           }
@@ -871,7 +1089,9 @@
       {
         "id": "flame_is_on",
         "title": {
-          "en": "Flame is !{{on|off}}"
+          "en": "Flame is !{{on|off}}",
+          "ru": "Пламя !{{горит|не горит}}",
+          "uk": "Полум'я !{{горить|не горить}}"
         },
         "args": [
           {
@@ -884,10 +1104,14 @@
       {
         "id": "pressure_below",
         "title": {
-          "en": "Water pressure is !{{below|above}}"
+          "en": "Water pressure is !{{below|above}}",
+          "ru": "Давление воды !{{ниже|выше}}",
+          "uk": "Тиск води !{{нижче|вище}}"
         },
         "titleFormatted": {
-          "en": "Water pressure is !{{below|above}} [[bar]] bar"
+          "en": "Water pressure is !{{below|above}} [[bar]] bar",
+          "ru": "Давление воды !{{ниже|выше}} [[bar]] бар",
+          "uk": "Тиск води !{{нижче|вище}} [[bar]] бар"
         },
         "args": [
           {
@@ -902,7 +1126,9 @@
             "max": 4,
             "step": 0.1,
             "placeholder": {
-              "en": "1.0"
+              "en": "1.0",
+              "ru": "1.0",
+              "uk": "1.0"
             }
           }
         ]
@@ -910,10 +1136,14 @@
       {
         "id": "mode_is",
         "title": {
-          "en": "Mode !{{is|is not}}"
+          "en": "Mode !{{is|is not}}",
+          "ru": "Режим !{{—|не}}",
+          "uk": "Режим !{{—|не}}"
         },
         "titleFormatted": {
-          "en": "Mode !{{is|is not}} [[mode]]"
+          "en": "Mode !{{is|is not}} [[mode]]",
+          "ru": "Режим !{{—|не}} [[mode]]",
+          "uk": "Режим !{{—|не}} [[mode]]"
         },
         "args": [
           {
@@ -928,31 +1158,41 @@
               {
                 "id": "comfort",
                 "label": {
-                  "en": "Comfort"
+                  "en": "Comfort",
+                  "ru": "Комфорт",
+                  "uk": "Комфорт"
                 }
               },
               {
                 "id": "eco",
                 "label": {
-                  "en": "Eco"
+                  "en": "Eco",
+                  "ru": "Эко",
+                  "uk": "Еко"
                 }
               },
               {
                 "id": "away",
                 "label": {
-                  "en": "Away (frost protection)"
+                  "en": "Away (frost protection)",
+                  "ru": "Отъезд (защита от замерзания)",
+                  "uk": "Від'їзд (захист від замерзання)"
                 }
               },
               {
                 "id": "boost",
                 "label": {
-                  "en": "Boost"
+                  "en": "Boost",
+                  "ru": "Буст",
+                  "uk": "Буст"
                 }
               },
               {
                 "id": "off",
                 "label": {
-                  "en": "Heating off"
+                  "en": "Heating off",
+                  "ru": "Отопление выключено",
+                  "uk": "Опалення вимкнено"
                 }
               }
             ]
@@ -962,7 +1202,9 @@
       {
         "id": "pressure_is_low",
         "title": {
-          "en": "Water pressure !{{is|is not}} low"
+          "en": "Water pressure !{{is|is not}} low",
+          "ru": "Давление воды !{{низкое|в норме}}",
+          "uk": "Тиск води !{{низький|в нормі}}"
         },
         "args": [
           {
@@ -977,13 +1219,19 @@
       {
         "id": "set_flow_temperature",
         "title": {
-          "en": "Set heating flow setpoint"
+          "en": "Set heating flow setpoint",
+          "ru": "Задать уставку подачи",
+          "uk": "Задати уставку подачі"
         },
         "titleFormatted": {
-          "en": "Set heating flow setpoint to [[temperature]] °C"
+          "en": "Set heating flow setpoint to [[temperature]] °C",
+          "ru": "Задать уставку подачи [[temperature]] °C",
+          "uk": "Задати уставку подачі [[temperature]] °C"
         },
         "hint": {
-          "en": "Also switches on control by Homey."
+          "en": "Also switches on control by Homey.",
+          "ru": "Также включает управление из Homey.",
+          "uk": "Також вмикає керування з Homey."
         },
         "args": [
           {
@@ -1003,13 +1251,19 @@
       {
         "id": "set_hwc_temperature",
         "title": {
-          "en": "Set hot water setpoint"
+          "en": "Set hot water setpoint",
+          "ru": "Задать уставку горячей воды",
+          "uk": "Задати уставку гарячої води"
         },
         "titleFormatted": {
-          "en": "Set hot water setpoint to [[temperature]] °C"
+          "en": "Set hot water setpoint to [[temperature]] °C",
+          "ru": "Задать уставку горячей воды [[temperature]] °C",
+          "uk": "Задати уставку гарячої води [[temperature]] °C"
         },
         "hint": {
-          "en": "Also switches on control by Homey."
+          "en": "Also switches on control by Homey.",
+          "ru": "Также включает управление из Homey.",
+          "uk": "Також вмикає керування з Homey."
         },
         "args": [
           {
@@ -1029,10 +1283,14 @@
       {
         "id": "set_bus_control",
         "title": {
-          "en": "Turn control by Homey"
+          "en": "Turn control by Homey",
+          "ru": "Управление из Homey",
+          "uk": "Керування з Homey"
         },
         "titleFormatted": {
-          "en": "Turn control by Homey [[state]]"
+          "en": "Turn control by Homey [[state]]",
+          "ru": "Управление из Homey: [[state]]",
+          "uk": "Керування з Homey: [[state]]"
         },
         "args": [
           {
@@ -1047,13 +1305,17 @@
               {
                 "id": "on",
                 "label": {
-                  "en": "on"
+                  "en": "on",
+                  "ru": "включить",
+                  "uk": "увімкнути"
                 }
               },
               {
                 "id": "off",
                 "label": {
-                  "en": "off (boiler panel)"
+                  "en": "off (boiler panel)",
+                  "ru": "выключить (панель котла)",
+                  "uk": "вимкнути (панель котла)"
                 }
               }
             ]
@@ -1063,13 +1325,19 @@
       {
         "id": "set_mode",
         "title": {
-          "en": "Set mode"
+          "en": "Set mode",
+          "ru": "Задать режим",
+          "uk": "Задати режим"
         },
         "titleFormatted": {
-          "en": "Set mode to [[mode]]"
+          "en": "Set mode to [[mode]]",
+          "ru": "Задать режим [[mode]]",
+          "uk": "Задати режим [[mode]]"
         },
         "hint": {
-          "en": "Also switches on control by Homey."
+          "en": "Also switches on control by Homey.",
+          "ru": "Также включает управление из Homey.",
+          "uk": "Також вмикає керування з Homey."
         },
         "args": [
           {
@@ -1084,31 +1352,41 @@
               {
                 "id": "comfort",
                 "label": {
-                  "en": "Comfort"
+                  "en": "Comfort",
+                  "ru": "Комфорт",
+                  "uk": "Комфорт"
                 }
               },
               {
                 "id": "eco",
                 "label": {
-                  "en": "Eco"
+                  "en": "Eco",
+                  "ru": "Эко",
+                  "uk": "Еко"
                 }
               },
               {
                 "id": "away",
                 "label": {
-                  "en": "Away (frost protection)"
+                  "en": "Away (frost protection)",
+                  "ru": "Отъезд (защита от замерзания)",
+                  "uk": "Від'їзд (захист від замерзання)"
                 }
               },
               {
                 "id": "boost",
                 "label": {
-                  "en": "Boost"
+                  "en": "Boost",
+                  "ru": "Буст",
+                  "uk": "Буст"
                 }
               },
               {
                 "id": "off",
                 "label": {
-                  "en": "Heating off"
+                  "en": "Heating off",
+                  "ru": "Отопление выключено",
+                  "uk": "Опалення вимкнено"
                 }
               }
             ]
@@ -1118,10 +1396,14 @@
       {
         "id": "boost_for",
         "title": {
-          "en": "Boost heating"
+          "en": "Boost heating",
+          "ru": "Буст отопления",
+          "uk": "Буст опалення"
         },
         "titleFormatted": {
-          "en": "Boost heating for [[minutes]] minutes"
+          "en": "Boost heating for [[minutes]] minutes",
+          "ru": "Буст отопления на [[minutes]] мин",
+          "uk": "Буст опалення на [[minutes]] хв"
         },
         "args": [
           {
@@ -1141,13 +1423,19 @@
       {
         "id": "set_room_temperature",
         "title": {
-          "en": "Set room target"
+          "en": "Set room target",
+          "ru": "Задать желаемую в комнате",
+          "uk": "Задати бажану в кімнаті"
         },
         "titleFormatted": {
-          "en": "Set room target to [[temperature]] °C"
+          "en": "Set room target to [[temperature]] °C",
+          "ru": "Задать желаемую в комнате [[temperature]] °C",
+          "uk": "Задати бажану в кімнаті [[temperature]] °C"
         },
         "hint": {
-          "en": "Comfort target. Also switches on control by Homey."
+          "en": "Comfort target. Also switches on control by Homey.",
+          "ru": "Цель режима Комфорт. Также включает управление из Homey.",
+          "uk": "Ціль режиму Комфорт. Також вмикає керування з Homey."
         },
         "args": [
           {
@@ -1167,10 +1455,14 @@
       {
         "id": "set_regulation",
         "title": {
-          "en": "Set regulation"
+          "en": "Set regulation",
+          "ru": "Задать регулирование",
+          "uk": "Задати регулювання"
         },
         "titleFormatted": {
-          "en": "Set regulation to [[regulation]]"
+          "en": "Set regulation to [[regulation]]",
+          "ru": "Регулирование: [[regulation]]",
+          "uk": "Регулювання: [[regulation]]"
         },
         "args": [
           {
@@ -1185,13 +1477,17 @@
               {
                 "id": "manual",
                 "label": {
-                  "en": "manual flow setpoint"
+                  "en": "manual flow setpoint",
+                  "ru": "ручная уставка подачи",
+                  "uk": "ручна уставка подачі"
                 }
               },
               {
                 "id": "curve",
                 "label": {
-                  "en": "weather curve + room"
+                  "en": "weather curve + room",
+                  "ru": "погодная кривая + комната",
+                  "uk": "погодна крива + кімната"
                 }
               }
             ]
@@ -1201,10 +1497,14 @@
       {
         "id": "reset_gas",
         "title": {
-          "en": "Reset gas counter"
+          "en": "Reset gas counter",
+          "ru": "Установить счётчик газа",
+          "uk": "Встановити лічильник газу"
         },
         "titleFormatted": {
-          "en": "Set gas counter to [[value]] m³"
+          "en": "Set gas counter to [[value]] m³",
+          "ru": "Установить счётчик газа на [[value]] м³",
+          "uk": "Встановити лічильник газу на [[value]] м³"
         },
         "args": [
           {

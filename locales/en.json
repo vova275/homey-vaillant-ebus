@@ -1,1 +1,33 @@
-{}
+{
+  "pair": {
+    "title": "Connect to eBUS",
+    "subtitle": "Where can Homey reach the boiler bus?",
+    "type": "Connection type",
+    "ebusd": "ebusd service (Raspberry Pi / PC)",
+    "enhanced": "eBUS adapter directly (v5 / C5 / C6 / ESP, enhanced protocol)",
+    "host": "Host / IP address",
+    "port": "Port",
+    "portHint": "ebusd: 8888 (start it with --enablehex). ebusd.eu adapters: 9999.",
+    "address": "Own master address (hex)",
+    "connect": "Connect",
+    "found": "Found",
+    "flow": "Flow",
+    "pressure": "pressure",
+    "failed": "Failed"
+  },
+  "settings": {
+    "title": "Vaillant eBUS — temperature sources",
+    "subtitle": "Used by the weather curve and room correction (device setting “Regulation = Weather curve + room sensors”).",
+    "outdoor": "Outdoor temperature",
+    "outdoorHint": "“Weather” uses Open-Meteo for your Homey location, refreshed every 15 minutes.",
+    "weather": "Weather (internet)",
+    "none": "None",
+    "rooms": "Room sensors (average)",
+    "loading": "Loading…",
+    "noSensors": "No temperature sensors found in Homey.",
+    "now": "Now",
+    "room": "room",
+    "save": "Save",
+    "saved": "Saved"
+  }
+}

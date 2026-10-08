@@ -1,0 +1,162 @@
+'use strict';
+
+// Russian and Ukrainian for every English string in app.json.
+// Run `node tools/translations.js` after changing texts in the manifest; it fills
+// in "ru" and "uk" next to each "en" and lists strings that have no translation yet.
+
+const fs = require('fs');
+const path = require('path');
+
+const T = [
+  // [en, ru, uk]
+  ['Vaillant eBUS', 'Vaillant eBUS', 'Vaillant eBUS'],
+  ['Local monitoring and control of Vaillant boilers over eBUS', 'Локальный мониторинг и управление котлами Vaillant через eBUS', 'Локальний моніторинг і керування котлами Vaillant через eBUS'],
+  ['Water pressure', 'Давление воды', 'Тиск води'],
+  ['bar', 'бар', 'бар'],
+  ['Modulation', 'Модуляция', 'Модуляція'],
+  ['%', '%', '%'],
+  ['Flame', 'Пламя', 'Полум\'я'],
+  ['Flame on', 'Пламя есть', 'Полум\'я є'],
+  ['Flame off', 'Пламени нет', 'Полум\'я немає'],
+  ['Hot water demand', 'Запрос горячей воды', 'Запит гарячої води'],
+  ['Controlled by Homey', 'Управление из Homey', 'Керування з Homey'],
+  ['On: Homey acts as the room controller and re-sends its setpoint every minute (overrides the boiler panel). Off: Homey only reads.',
+    'Вкл.: Homey работает как комнатный регулятор и каждую минуту отправляет уставку (панель котла не действует). Выкл.: Homey только читает данные.',
+    'Увімк.: Homey працює як кімнатний регулятор і щохвилини надсилає уставку (панель котла не діє). Вимк.: Homey лише читає дані.'],
+  ['Error', 'Ошибка', 'Помилка'],
+  ['Mode', 'Режим', 'Режим'],
+  ['Comfort', 'Комфорт', 'Комфорт'],
+  ['Eco', 'Эко', 'Еко'],
+  ['Away (frost protection)', 'Отъезд (защита от замерзания)', 'Від\'їзд (захист від замерзання)'],
+  ['Boost', 'Буст', 'Буст'],
+  ['Heating off', 'Отопление выключено', 'Опалення вимкнено'],
+  ['Heating requested', 'Запрос на отопление', 'Запит на опалення'],
+  ['Low water pressure', 'Низкое давление воды', 'Низький тиск води'],
+  ['Heat output (estimated)', 'Тепловая мощность (оценка)', 'Теплова потужність (оцінка)'],
+  ['kW', 'кВт', 'кВт'],
+  ['Vaillant gas boiler', 'Газовый котёл Vaillant', 'Газовий котел Vaillant'],
+  ['Room target', 'Желаемая в комнате', 'Бажана в кімнаті'],
+  ['Room temperature', 'Температура в комнате', 'Температура в кімнаті'],
+  ['Heating flow setpoint', 'Уставка подачи отопления', 'Уставка подачі опалення'],
+  ['Flow temperature', 'Температура подачи', 'Температура подачі'],
+  ['Return temperature', 'Температура обратки', 'Температура зворотки'],
+  ['Outdoor temperature', 'Температура на улице', 'Температура на вулиці'],
+  ['Hot water temperature', 'Температура горячей воды', 'Температура гарячої води'],
+  ['Hot water setpoint', 'Уставка горячей воды', 'Уставка гарячої води'],
+  ['Gas (estimated)', 'Газ (оценка)', 'Газ (оцінка)'],
+  ['Boiler fault', 'Неисправность котла', 'Несправність котла'],
+  ['Connection', 'Подключение', 'Підключення'],
+  ['Connection type', 'Тип подключения', 'Тип підключення'],
+  ['ebusd daemon (TCP 8888, needs --enablehex)', 'Сервис ebusd (TCP 8888, нужен --enablehex)', 'Сервіс ebusd (TCP 8888, потрібен --enablehex)'],
+  ['Adapter, enhanced protocol (v5/v5-C6/ESP)', 'Адаптер, enhanced-протокол (v5/C5/C6/ESP)', 'Адаптер, enhanced-протокол (v5/C5/C6/ESP)'],
+  ['Host / IP', 'Хост / IP', 'Хост / IP'],
+  ['Port', 'Порт', 'Порт'],
+  ['Own master address (hex, enhanced only)', 'Свой адрес мастера (hex, только для адаптера)', 'Власна адреса майстра (hex, лише для адаптера)'],
+  ['Must be a free eBUS master address. 31 is ebusd\'s default; do not use 10 if a Vaillant controller is on the bus.',
+    'Должен быть свободный адрес мастера eBUS. 31 — по умолчанию в ebusd; не используйте 10, если на шине есть регулятор Vaillant.',
+    'Має бути вільна адреса майстра eBUS. 31 — типова в ebusd; не використовуйте 10, якщо на шині є регулятор Vaillant.'],
+  ['Timing', 'Интервалы', 'Інтервали'],
+  ['Poll interval', 'Интервал опроса', 'Інтервал опитування'],
+  ['s', 'с', 'с'],
+  ['Setpoint refresh interval', 'Интервал отправки уставки', 'Інтервал надсилання уставки'],
+  ['How often the setpoint is re-sent while Homey controls the boiler, like a room controller does.',
+    'Как часто уставка отправляется повторно, пока Homey управляет котлом (как это делает комнатный регулятор).',
+    'Як часто уставка надсилається повторно, поки Homey керує котлом (як це робить кімнатний регулятор).'],
+  ['Heating regulation', 'Регулирование отопления', 'Регулювання опалення'],
+  ['Regulation', 'Регулирование', 'Регулювання'],
+  ['Manual flow setpoint', 'Ручная уставка подачи', 'Ручна уставка подачі'],
+  ['Weather curve + room sensors', 'Погодная кривая + комнатные датчики', 'Погодна крива + кімнатні датчики'],
+  ['Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room sensors chosen in the app settings.',
+    'Погодная кривая: уставка подачи зависит от уличной температуры и корректируется комнатными датчиками, выбранными в настройках приложения.',
+    'Погодна крива: уставка подачі залежить від вуличної температури й коригується кімнатними датчиками, вибраними в налаштуваннях застосунку.'],
+  ['Curve slope', 'Наклон кривой', 'Нахил кривої'],
+  ['Floor heating 0.4–0.8, radiators 1.0–1.6, poorly insulated 1.6–2.2.', 'Тёплый пол 0,4–0,8, радиаторы 1,0–1,6, плохо утеплённый дом 1,6–2,2.', 'Тепла підлога 0,4–0,8, радіатори 1,0–1,6, погано утеплений будинок 1,6–2,2.'],
+  ['Curve shift', 'Сдвиг кривой', 'Зсув кривої'],
+  ['°C', '°C', '°C'],
+  ['Moves the whole curve up or down.', 'Сдвигает всю кривую вверх или вниз.', 'Зсуває всю криву вгору або вниз.'],
+  ['Minimum flow temperature', 'Минимальная температура подачи', 'Мінімальна температура подачі'],
+  ['Maximum flow temperature', 'Максимальная температура подачи', 'Максимальна температура подачі'],
+  ['Summer cut-off (outdoor)', 'Летнее отключение (улица)', 'Літнє вимкнення (вулиця)'],
+  ['No heating when it is this warm outside.', 'Отопление не работает, если на улице так тепло.', 'Опалення не працює, якщо на вулиці так тепло.'],
+  ['Room influence', 'Влияние комнаты', 'Вплив кімнати'],
+  ['°C per K', '°C на K', '°C на K'],
+  ['How many degrees of flow per degree the room is off target.', 'На сколько градусов меняется подача на каждый градус отклонения в комнате.', 'На скільки градусів змінюється подача на кожен градус відхилення в кімнаті.'],
+  ['Room learning speed', 'Скорость подстройки', 'Швидкість підлаштування'],
+  ['°C per K·h', '°C на K·ч', '°C на K·год'],
+  ['Slowly shifts the curve if the room stays too cold or too warm. 0 = off.', 'Медленно сдвигает кривую, если в комнате постоянно холодно или жарко. 0 = выкл.', 'Повільно зсуває криву, якщо в кімнаті постійно холодно або спекотно. 0 = вимк.'],
+  ['Room overshoot before heating stops', 'Перегрев комнаты до отключения отопления', 'Перегрів кімнати до вимкнення опалення'],
+  ['Modes', 'Режимы', 'Режими'],
+  ['Eco: lower room target by', 'Эко: понизить желаемую на', 'Еко: знизити бажану на'],
+  ['Away: room temperature', 'Отъезд: температура в комнате', 'Від\'їзд: температура в кімнаті'],
+  ['Boost: flow temperature', 'Буст: температура подачи', 'Буст: температура подачі'],
+  ['Boost: duration', 'Буст: длительность', 'Буст: тривалість'],
+  ['min', 'мин', 'хв'],
+  ['Alarms', 'Тревоги', 'Тривоги'],
+  ['Low water pressure alarm below', 'Тревога низкого давления ниже', 'Тривога низького тиску нижче'],
+  ['Gas estimate', 'Оценка расхода газа', 'Оцінка витрати газу'],
+  ['Nominal heat output', 'Номинальная мощность', 'Номінальна потужність'],
+  ['From the type plate, e.g. VU 246 = 24 kW.', 'С шильдика, например VU 246 = 24 кВт.', 'З таблички, наприклад VU 246 = 24 кВт.'],
+  ['Minimum heat output', 'Минимальная мощность', 'Мінімальна потужність'],
+  ['Gas energy content', 'Теплотворность газа', 'Теплотворність газу'],
+  ['kWh/m³', 'кВт·ч/м³', 'кВт·год/м³'],
+  ['Efficiency', 'КПД', 'ККД'],
+  ['Flame turned on', 'Пламя зажглось', 'Полум\'я запалилось'],
+  ['Flame turned off', 'Пламя погасло', 'Полум\'я згасло'],
+  ['Boiler error changed', 'Изменилась ошибка котла', 'Змінилась помилка котла'],
+  ['F.28', 'F.28', 'F.28'],
+  ['Fault active', 'Неисправность активна', 'Несправність активна'],
+  ['Water pressure changed', 'Изменилось давление воды', 'Змінився тиск води'],
+  ['Pressure (bar)', 'Давление (бар)', 'Тиск (бар)'],
+  ['Water pressure dropped below the alarm level', 'Давление воды упало ниже порога тревоги', 'Тиск води впав нижче порогу тривоги'],
+  ['Water pressure back to normal', 'Давление воды восстановилось', 'Тиск води відновився'],
+  ['Mode changed', 'Режим изменился', 'Режим змінився'],
+  ['Flame is !{{on|off}}', 'Пламя !{{горит|не горит}}', 'Полум\'я !{{горить|не горить}}'],
+  ['Water pressure is !{{below|above}}', 'Давление воды !{{ниже|выше}}', 'Тиск води !{{нижче|вище}}'],
+  ['Water pressure is !{{below|above}} [[bar]] bar', 'Давление воды !{{ниже|выше}} [[bar]] бар', 'Тиск води !{{нижче|вище}} [[bar]] бар'],
+  ['1.0', '1.0', '1.0'],
+  ['Mode !{{is|is not}}', 'Режим !{{—|не}}', 'Режим !{{—|не}}'],
+  ['Mode !{{is|is not}} [[mode]]', 'Режим !{{—|не}} [[mode]]', 'Режим !{{—|не}} [[mode]]'],
+  ['Water pressure !{{is|is not}} low', 'Давление воды !{{низкое|в норме}}', 'Тиск води !{{низький|в нормі}}'],
+  ['Set heating flow setpoint', 'Задать уставку подачи', 'Задати уставку подачі'],
+  ['Set heating flow setpoint to [[temperature]] °C', 'Задать уставку подачи [[temperature]] °C', 'Задати уставку подачі [[temperature]] °C'],
+  ['Also switches on control by Homey.', 'Также включает управление из Homey.', 'Також вмикає керування з Homey.'],
+  ['Set hot water setpoint', 'Задать уставку горячей воды', 'Задати уставку гарячої води'],
+  ['Set hot water setpoint to [[temperature]] °C', 'Задать уставку горячей воды [[temperature]] °C', 'Задати уставку гарячої води [[temperature]] °C'],
+  ['Turn control by Homey', 'Управление из Homey', 'Керування з Homey'],
+  ['Turn control by Homey [[state]]', 'Управление из Homey: [[state]]', 'Керування з Homey: [[state]]'],
+  ['on', 'включить', 'увімкнути'],
+  ['off (boiler panel)', 'выключить (панель котла)', 'вимкнути (панель котла)'],
+  ['Set mode', 'Задать режим', 'Задати режим'],
+  ['Set mode to [[mode]]', 'Задать режим [[mode]]', 'Задати режим [[mode]]'],
+  ['Boost heating', 'Буст отопления', 'Буст опалення'],
+  ['Boost heating for [[minutes]] minutes', 'Буст отопления на [[minutes]] мин', 'Буст опалення на [[minutes]] хв'],
+  ['Set room target', 'Задать желаемую в комнате', 'Задати бажану в кімнаті'],
+  ['Set room target to [[temperature]] °C', 'Задать желаемую в комнате [[temperature]] °C', 'Задати бажану в кімнаті [[temperature]] °C'],
+  ['Comfort target. Also switches on control by Homey.', 'Цель режима Комфорт. Также включает управление из Homey.', 'Ціль режиму Комфорт. Також вмикає керування з Homey.'],
+  ['Set regulation', 'Задать регулирование', 'Задати регулювання'],
+  ['Set regulation to [[regulation]]', 'Регулирование: [[regulation]]', 'Регулювання: [[regulation]]'],
+  ['manual flow setpoint', 'ручная уставка подачи', 'ручна уставка подачі'],
+  ['weather curve + room', 'погодная кривая + комната', 'погодна крива + кімната'],
+  ['Reset gas counter', 'Установить счётчик газа', 'Встановити лічильник газу'],
+  ['Set gas counter to [[value]] m³', 'Установить счётчик газа на [[value]] м³', 'Встановити лічильник газу на [[value]] м³'],
+];
+
+if (require.main === module) {
+  const file = path.join(__dirname, '..', 'app.json');
+  const j = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const map = new Map(T.map(([en, ru, uk]) => [en, { ru, uk }]));
+  const missing = new Set();
+  (function walk(o) {
+    if (Array.isArray(o)) { o.forEach(walk); return; }
+    if (!o || typeof o !== 'object') return;
+    if (typeof o.en === 'string') {
+      const t = map.get(o.en);
+      if (t) { o.ru = t.ru; o.uk = t.uk; } else missing.add(o.en);
+    }
+    Object.values(o).forEach(walk);
+  })(j);
+  fs.writeFileSync(file, `${JSON.stringify(j, null, 2)}\n`);
+  console.log(missing.size ? `untranslated:\n  ${[...missing].join('\n  ')}` : 'all strings translated');
+}
+
+module.exports = T;

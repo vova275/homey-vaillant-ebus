@@ -7,37 +7,38 @@
 </style>
 
 <header class="homey-header">
-  <h1 class="homey-title">Connect to eBUS</h1>
-  <p class="homey-subtitle">Where can Homey reach the boiler's bus?</p>
+  <h1 class="homey-title" data-i18n="pair.title"></h1>
+  <p class="homey-subtitle" data-i18n="pair.subtitle"></p>
 </header>
 
 <form class="homey-form" onsubmit="return false;">
   <div class="field">
-    <label for="transport">Connection type</label>
+    <label for="transport" data-i18n="pair.type"></label>
     <select id="transport" class="homey-form-select">
-      <option value="ebusd">ebusd daemon (Raspberry Pi / PC)</option>
-      <option value="enhanced">eBUS adapter directly (v5 / v5-C6 / ESP, enhanced protocol)</option>
+      <option value="ebusd" data-i18n="pair.ebusd"></option>
+      <option value="enhanced" data-i18n="pair.enhanced"></option>
     </select>
   </div>
   <div class="field">
-    <label for="host">Host / IP address</label>
+    <label for="host" data-i18n="pair.host"></label>
     <input id="host" class="homey-form-input" type="text" placeholder="192.168.1.50">
   </div>
   <div class="field">
-    <label for="port">Port</label>
+    <label for="port" data-i18n="pair.port"></label>
     <input id="port" class="homey-form-input" type="number" value="8888">
-    <div class="hint">ebusd: 8888 (start it with --enablehex). v5-C6 adapter: 9999.</div>
+    <div class="hint" data-i18n="pair.portHint"></div>
   </div>
   <div class="field" id="addrField" style="display:none">
-    <label for="address">Own master address (hex)</label>
+    <label for="address" data-i18n="pair.address"></label>
     <input id="address" class="homey-form-input" type="text" value="31">
   </div>
-  <button id="go" class="homey-button-primary-full">Connect</button>
+  <button id="go" class="homey-button-primary-full" data-i18n="pair.connect"></button>
   <div id="result"></div>
 </form>
 
 <script>
   const el = (id) => document.getElementById(id);
+  document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = Homey.__(n.dataset.i18n); });
   el('transport').addEventListener('change', () => {
     const enh = el('transport').value === 'enhanced';
     el('port').value = enh ? 9999 : 8888;
@@ -53,11 +54,11 @@
         port: el('port').value,
         address: el('address').value.trim(),
       });
-      el('result').textContent = `Found ${r.ident.manufacturer} ${r.ident.id} (SW ${r.ident.sw})\n`
-        + `Flow ${r.state.flowTemp} °C, pressure ${r.state.pressure} bar`;
+      el('result').textContent = `${Homey.__('pair.found')}: ${r.ident.manufacturer} ${r.ident.id} (SW ${r.ident.sw})\n`
+        + `${Homey.__('pair.flow')} ${r.state.flowTemp} °C, ${Homey.__('pair.pressure')} ${r.state.pressure} bar`;
       setTimeout(() => Homey.showView('list_devices'), 1200);
     } catch (err) {
-      el('result').textContent = `Failed: ${err.message || err}`;
+      el('result').textContent = `${Homey.__('pair.failed')}: ${err.message || err}`;
     } finally {
       el('go').classList.remove('is-loading');
     }
