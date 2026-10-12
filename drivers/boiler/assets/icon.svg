@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960">
-  <path fill-rule="evenodd" d="M330 70h300a70 70 0 0 1 70 70v620a70 70 0 0 1-70 70H330a70 70 0 0 1-70-70V140a70 70 0 0 1 70-70zm10 60a20 20 0 0 0-20 20v600a20 20 0 0 0 20 20h280a20 20 0 0 0 20-20V150a20 20 0 0 0-20-20z"/>
-  <path d="M480 220c22 50 86 76 86 150a86 86 0 0 1-172 0c0-38 22-62 40-84 6 20 19 32 19 46 16-42 27-76 27-112z"/>
-  <rect x="350" y="580" width="260" height="120" rx="24"/>
-  <rect x="340" y="830" width="44" height="90" rx="14"/>
-  <rect x="458" y="830" width="44" height="90" rx="14"/>
-  <rect x="576" y="830" width="44" height="90" rx="14"/>
+  <!-- wall-hung boiler at a slight angle, like the turboTEC photo: side panel on the left,
+       front case with a seam above the control panel, display and a round knob -->
+  <path fill-rule="evenodd" d="M150 150L290 70V890L150 840Z"/>
+  <path fill-rule="evenodd" d="M330 70h440a50 50 0 0 1 50 50v720a50 50 0 0 1-50 50H330a20 20 0 0 1-20-20V90a20 20 0 0 1 20-20zm34 52v468h410V136a14 14 0 0 0-14-14zm0 524v192h396a14 14 0 0 0 14-14V646z"/>
+  <rect x="484" y="680" width="170" height="70" rx="12"/>
+  <circle cx="569" cy="800" r="30"/>
 </svg>
