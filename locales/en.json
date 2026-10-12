@@ -14,27 +14,5 @@
     "flow": "Flow",
     "pressure": "pressure",
     "failed": "Failed"
-  },
-  "settings": {
-    "title": "Vaillant eBUS — temperature sources",
-    "subtitle": "Used by the weather curve and room correction (device setting “Regulation = Weather curve + room sensors”).",
-    "outdoor": "Outdoor temperature",
-    "outdoorHint": "“Weather” uses Open-Meteo for your Homey location, refreshed every 15 minutes.",
-    "weather": "Weather (internet)",
-    "none": "None",
-    "rooms": "Room sensors (average)",
-    "loading": "Loading…",
-    "noSensors": "No temperature sensors found in Homey.",
-    "now": "Now",
-    "room": "room",
-    "save": "Save",
-    "saved": "Saved",
-    "roomsHint": "Only tick sensors you trust. Leave empty if room temperatures are already handled by zone thermostats.",
-    "valves": "Zone valves / relays (heat demand)",
-    "valvesHint": "Heating runs only while at least one of these is on (valve open). Leave empty to ignore.",
-    "valvesOpen": "valves open",
-    "noDevices": "No suitable devices found in Homey.",
-    "on": "on",
-    "off": "off"
   }
 }

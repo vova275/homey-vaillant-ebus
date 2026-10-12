@@ -1,11 +1,11 @@
 'use strict';
 
 const Homey = require('homey');
-const Sensors = require('./lib/sensors');
+const { Weather } = require('./lib/weather');
 
 class VaillantEbusApp extends Homey.App {
   async onInit() {
-    this.sensors = new Sensors(this.homey, (...a) => this.log(...a));
+    this.weather = new Weather(this.homey, (...a) => this.log(...a));
     this.log('Vaillant eBUS app started');
   }
 }

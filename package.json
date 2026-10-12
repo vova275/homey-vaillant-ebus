@@ -1,15 +1,12 @@
 {
   "name": "ua.te.its.vaillantebus",
-  "version": "0.3.4",
-  "description": "Local monitoring and control of Vaillant boilers over eBUS for Homey Pro",
+  "version": "0.4.0",
+  "description": "Vaillant boiler (eBUS) app for Homey Pro",
   "main": "app.js",
   "author": "vova275 <vova275@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "node tools/test-ebus.js && node tools/test-heating.js",
+    "test": "node tools/test-ebus.js && node tools/test-heating.js && node tools/test-inputs.js",
     "probe": "node tools/probe.js"
-  },
-  "dependencies": {
-    "homey-api": "^3.20.1"
   }
 }

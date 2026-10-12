@@ -4,6 +4,7 @@ const Homey = require('homey');
 const { Boiler } = require('../../lib/boiler');
 const heating = require('../../lib/heating');
 const { describe } = require('../../lib/fcodes');
+const { Inputs } = require('../../lib/inputs');
 
 // While "Controlled by Homey" is on, this device acts as the boiler's room
 // controller: every control interval it computes a flow setpoint (manual,
@@ -34,6 +35,7 @@ class BoilerDevice extends Homey.Device {
     listen('bus_control', (v) => this.setBusControl(v));
 
     this.ctl = this.getStoreValue('ctl') || {};
+    this.inputs = new Inputs(this.getStoreValue('inputs') || {});
     this._t = {
       room: this.getStoreValue('room') ?? 21,
       flow: this.getStoreValue('flow') ?? 40,
@@ -44,12 +46,6 @@ class BoilerDevice extends Homey.Device {
     };
     await this._show();
     this._connect();
-
-    // zone valve relays: react to a valve switching right away (debounced)
-    this.app.sensors.watchValves(() => {
-      this.homey.clearTimeout(this.valveTimer);
-      this.valveTimer = this.homey.setTimeout(() => this.control(), 2000);
-    }).catch((err) => this.log('watch valves:', err.message));
   }
 
   /** Bring a device paired with an older version to the current capability list. */
@@ -128,16 +124,46 @@ class BoilerDevice extends Homey.Device {
     await this._readSensors();
   }
 
+  /** Room and outdoor temperature: what the user's Flows reported, else the weather. */
   async _readSensors() {
+    const s = this.getSettings();
+    const maxAge = (s.sensor_timeout ?? 180) * 60e3;
     try {
-      const [room, outdoor] = await Promise.all([this.app.sensors.room(), this.app.sensors.outdoor()]);
-      this.room = room;
+      this.room = this.inputs.room(maxAge);
+      let outdoor = this.inputs.outdoor(maxAge);
+      if (outdoor == null && s.use_weather !== false) outdoor = await this.app.weather.temperature();
       this.outdoor = outdoor;
-      await this._set('measure_temperature', room);
-      await this._set('measure_temperature.outdoor', outdoor);
+      await this._set('measure_temperature', this.room);
+      await this._set('measure_temperature.outdoor', this.outdoor);
     } catch (err) {
       this.log('sensors:', err.message);
     }
+  }
+
+  // ---------- values reported by the user's Flows ----------
+
+  async _saveInputs() {
+    await this.setStoreValue('inputs', this.inputs.toJSON());
+  }
+
+  async reportRoom(temperature, name) {
+    this.inputs.reportRoom(temperature, name);
+    await this._saveInputs();
+    await this._readSensors();
+  }
+
+  async reportOutdoor(temperature) {
+    this.inputs.reportOutdoor(temperature);
+    await this._saveInputs();
+    await this._readSensors();
+  }
+
+  /** A zone valve switched: react within seconds rather than at the next control interval. */
+  async setValve(number, open) {
+    this.inputs.setValve(number, open);
+    await this._saveInputs();
+    this.homey.clearTimeout(this.valveTimer);
+    this.valveTimer = this.homey.setTimeout(() => this.control(), 2000);
   }
 
   async _apply(st) {
@@ -244,7 +270,7 @@ class BoilerDevice extends Homey.Device {
 
     // zone valves: heat only while at least one is open, after the actuator delay
     if (r.heating) {
-      const v = await this.app.sensors.valves().catch(() => ({ selected: 0, open: 0 }));
+      const v = this.inputs.valveState(s.valve_count ?? 0);
       if (v.selected) {
         if (!v.open) {
           this.ctl.valvesSince = null;
@@ -356,6 +382,7 @@ class BoilerDevice extends Homey.Device {
   async onUninit() {
     this.homey.clearInterval(this.pollTimer);
     this.homey.clearInterval(this.controlTimer);
+    this.homey.clearTimeout(this.valveTimer);
     if (this.boiler) this.boiler.close();
   }
 }

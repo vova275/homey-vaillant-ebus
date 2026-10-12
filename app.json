@@ -1,6 +1,6 @@
 {
   "id": "ua.te.its.vaillantebus",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "compatibility": ">=12.0.0",
   "sdk": 3,
   "platforms": [
@@ -12,16 +12,15 @@
     "uk": "Vaillant eBUS"
   },
   "description": {
-    "en": "Local monitoring and control of Vaillant boilers over eBUS",
-    "ru": "Локальный мониторинг и управление котлами Vaillant через eBUS",
-    "uk": "Локальний моніторинг і керування котлами Vaillant через eBUS"
+    "en": "Turn your Vaillant boiler into smart, weather-aware heating.",
+    "ru": "Превратите котёл Vaillant в умное погодозависимое отопление.",
+    "uk": "Перетворіть котел Vaillant на розумне погодозалежне опалення."
   },
   "category": [
     "climate"
   ],
   "brandColor": "#00917E",
   "permissions": [
-    "homey:manager:api",
     "homey:manager:geolocation"
   ],
   "images": {
@@ -540,9 +539,9 @@
                 }
               ],
               "hint": {
-                "en": "Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room sensors chosen in the app settings.",
-                "ru": "Погодная кривая: уставка подачи зависит от уличной температуры и корректируется комнатными датчиками, выбранными в настройках приложения.",
-                "uk": "Погодна крива: уставка подачі залежить від вуличної температури й коригується кімнатними датчиками, вибраними в налаштуваннях застосунку."
+                "en": "Weather curve: the flow setpoint follows the outdoor temperature and is corrected by the room temperatures your Flows report.",
+                "ru": "Погодная кривая: уставка подачи зависит от уличной температуры и корректируется комнатной температурой, которую передают ваши Flow.",
+                "uk": "Погодна крива: уставка подачі залежить від вуличної температури й коригується кімнатною температурою, яку передають ваші Flow."
               }
             },
             {
@@ -708,6 +707,24 @@
               "step": 0.1
             },
             {
+              "id": "valve_count",
+              "type": "number",
+              "label": {
+                "en": "Zone valves",
+                "ru": "Клапаны зон",
+                "uk": "Клапани зон"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 8,
+              "step": 1,
+              "hint": {
+                "en": "How many zone valves report their state with the \"Zone valve is open/closed\" Flow card. 0 = no zone valves: heating is not tied to any valve.",
+                "ru": "Сколько клапанов зон передают состояние карточкой Flow «Клапан зоны открыт/закрыт». 0 — клапанов нет, отопление от них не зависит.",
+                "uk": "Скільки клапанів зон передають стан карткою Flow «Клапан зони відкритий/закритий». 0 — клапанів немає, опалення від них не залежить."
+              }
+            },
+            {
               "id": "valve_delay",
               "type": "number",
               "label": {
@@ -724,9 +741,9 @@
                 "uk": "хв"
               },
               "hint": {
-                "en": "Zone valves (app settings): heating starts this long after the first valve opens, so the actuators are open before the pump pushes water.",
-                "ru": "Клапаны зон (настройки приложения): отопление включается через это время после открытия первого клапана, чтобы сервоприводы успели открыться.",
-                "uk": "Клапани зон (налаштування застосунку): опалення вмикається через цей час після відкриття першого клапана, щоб сервоприводи встигли відкритися."
+                "en": "Heating starts this long after the first zone valve opens, so the actuators are open before the pump pushes water.",
+                "ru": "Отопление включается через это время после открытия первого клапана зоны, чтобы сервоприводы успели открыться.",
+                "uk": "Опалення вмикається через цей час після відкриття першого клапана зони, щоб сервоприводи встигли відкритися."
               }
             },
             {
@@ -757,9 +774,9 @@
                 }
               ],
               "hint": {
-                "en": "Only used when zone valves are chosen in the app settings.",
-                "ru": "Используется, только если в настройках приложения выбраны клапаны зон.",
-                "uk": "Використовується, лише якщо в налаштуваннях застосунку вибрано клапани зон."
+                "en": "Only used when the number of zone valves is above 0.",
+                "ru": "Используется, только если количество клапанов зон больше 0.",
+                "uk": "Використовується, лише якщо кількість клапанів зон більша за 0."
               }
             },
             {
@@ -777,6 +794,44 @@
                 "en": "°C",
                 "ru": "°C",
                 "uk": "°C"
+              }
+            },
+            {
+              "id": "sensor_timeout",
+              "type": "number",
+              "label": {
+                "en": "Sensor timeout",
+                "ru": "Таймаут датчиков",
+                "uk": "Таймаут датчиків"
+              },
+              "value": 180,
+              "min": 15,
+              "max": 1440,
+              "step": 5,
+              "units": {
+                "en": "min",
+                "ru": "мин",
+                "uk": "хв"
+              },
+              "hint": {
+                "en": "A room or outdoor temperature reported by a Flow is ignored once it is older than this.",
+                "ru": "Температура, переданная через Flow, перестаёт учитываться, если она старше этого времени.",
+                "uk": "Температура, передана через Flow, перестає враховуватися, якщо вона старша за цей час."
+              }
+            },
+            {
+              "id": "use_weather",
+              "type": "checkbox",
+              "label": {
+                "en": "Use the weather when no outdoor temperature is reported",
+                "ru": "Использовать погоду, если уличная температура не передаётся",
+                "uk": "Використовувати погоду, якщо вулична температура не передається"
+              },
+              "value": true,
+              "hint": {
+                "en": "Current temperature for your Homey's location, from Open-Meteo.",
+                "ru": "Текущая температура для местоположения Homey, из Open-Meteo.",
+                "uk": "Поточна температура для розташування Homey, з Open-Meteo."
               }
             }
           ]
@@ -1592,21 +1647,198 @@
             "step": 0.001
           }
         ]
+      },
+      {
+        "id": "report_room_temperature",
+        "title": {
+          "en": "Report room temperature",
+          "ru": "Передать температуру в комнате",
+          "uk": "Передати температуру в кімнаті"
+        },
+        "titleFormatted": {
+          "en": "Report room temperature [[temperature]] °C from [[sensor]]",
+          "ru": "Передать температуру в комнате [[temperature]] °C от [[sensor]]",
+          "uk": "Передати температуру в кімнаті [[temperature]] °C від [[sensor]]"
+        },
+        "hint": {
+          "en": "Use it in a Flow \"When the temperature changed\" of each room sensor. Readings from several sensors are averaged; give each a different name. A sensor that has not reported within the sensor timeout is ignored.",
+          "ru": "Используйте во Flow «Когда изменилась температура» каждого комнатного датчика. Показания нескольких датчиков усредняются — дайте каждому своё имя. Датчик, не передававший данные дольше таймаута, не учитывается.",
+          "uk": "Використовуйте у Flow «Коли змінилася температура» кожного кімнатного датчика. Показання кількох датчиків усереднюються — дайте кожному своє ім'я. Датчик, що не передавав дані довше таймауту, не враховується."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "min": -10,
+            "max": 40,
+            "step": 0.1
+          },
+          {
+            "name": "sensor",
+            "type": "text",
+            "required": false,
+            "placeholder": {
+              "en": "sensor name",
+              "ru": "имя датчика",
+              "uk": "назва датчика"
+            }
+          }
+        ]
+      },
+      {
+        "id": "report_outdoor_temperature",
+        "title": {
+          "en": "Report outdoor temperature",
+          "ru": "Передать уличную температуру",
+          "uk": "Передати вуличну температуру"
+        },
+        "titleFormatted": {
+          "en": "Report outdoor temperature [[temperature]] °C",
+          "ru": "Передать уличную температуру [[temperature]] °C",
+          "uk": "Передати вуличну температуру [[temperature]] °C"
+        },
+        "hint": {
+          "en": "For the heating curve. Without it the weather for your Homey's location is used.",
+          "ru": "Для погодной кривой. Без неё используется погода для местоположения Homey.",
+          "uk": "Для погодної кривої. Без неї використовується погода для розташування Homey."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "min": -50,
+            "max": 50,
+            "step": 0.1
+          }
+        ]
+      },
+      {
+        "id": "set_zone_valve",
+        "title": {
+          "en": "Report zone valve",
+          "ru": "Передать состояние клапана зоны",
+          "uk": "Передати стан клапана зони"
+        },
+        "titleFormatted": {
+          "en": "Zone valve [[valve]] is [[state]]",
+          "ru": "Клапан зоны [[valve]]: [[state]]",
+          "uk": "Клапан зони [[valve]]: [[state]]"
+        },
+        "hint": {
+          "en": "Use it in the Flows that switch your zone valve relays. Set the number of zone valves in the device settings.",
+          "ru": "Используйте во Flow, которые переключают реле клапанов зон. Количество клапанов задаётся в настройках устройства.",
+          "uk": "Використовуйте у Flow, що перемикають реле клапанів зон. Кількість клапанів задається в налаштуваннях пристрою."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=boiler"
+          },
+          {
+            "name": "valve",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "1",
+                "label": {
+                  "en": "1",
+                  "ru": "1",
+                  "uk": "1"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "2",
+                  "ru": "2",
+                  "uk": "2"
+                }
+              },
+              {
+                "id": "3",
+                "label": {
+                  "en": "3",
+                  "ru": "3",
+                  "uk": "3"
+                }
+              },
+              {
+                "id": "4",
+                "label": {
+                  "en": "4",
+                  "ru": "4",
+                  "uk": "4"
+                }
+              },
+              {
+                "id": "5",
+                "label": {
+                  "en": "5",
+                  "ru": "5",
+                  "uk": "5"
+                }
+              },
+              {
+                "id": "6",
+                "label": {
+                  "en": "6",
+                  "ru": "6",
+                  "uk": "6"
+                }
+              },
+              {
+                "id": "7",
+                "label": {
+                  "en": "7",
+                  "ru": "7",
+                  "uk": "7"
+                }
+              },
+              {
+                "id": "8",
+                "label": {
+                  "en": "8",
+                  "ru": "8",
+                  "uk": "8"
+                }
+              }
+            ]
+          },
+          {
+            "name": "state",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "open",
+                "label": {
+                  "en": "open",
+                  "ru": "открыт",
+                  "uk": "відкритий"
+                }
+              },
+              {
+                "id": "closed",
+                "label": {
+                  "en": "closed",
+                  "ru": "закрыт",
+                  "uk": "закритий"
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
-  },
-  "api": {
-    "getSensors": {
-      "method": "GET",
-      "path": "/sensors"
-    },
-    "getPreview": {
-      "method": "GET",
-      "path": "/preview"
-    },
-    "getSwitches": {
-      "method": "GET",
-      "path": "/switches"
-    }
   }
 }

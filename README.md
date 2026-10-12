@@ -28,16 +28,28 @@ Flow cards: flame on/off, error changed, pressure changed; conditions flame is o
 
 ## Hardware
 
-Homey cannot use USB devices, so the bus has to be reachable over the network:
+Homey reaches the boiler through an eBUS adapter on the boiler's eBUS terminals (2 wires, polarity does not matter):
 
-1. **ebusd** on a Raspberry Pi / PC with a USB eBUS adapter — start it with `--enablehex`:
-   `ebusd -d /dev/ttyUSB0 --port=8888 --enablehex --scanconfig`
-2. **An ebusd.eu adapter directly**, with no ebusd and no PC at all (v5, Shield C5, Shield C6, Stick C6):
-   update its firmware, connect it to your Wi-Fi (it opens an open AP named `EBUS`, then http://192.168.4.1),
-   wire it to the bus (polarity does not matter), and point this app at its IP on port 9999 with
-   connection type *Adapter, enhanced protocol*. The enhanced protocol is the adapter's free standard
-   mode — the paid token on those adapters is only for *micro-ebusd*, which this app does not use.
-   *Not yet tested on hardware.*
+1. **Wi-Fi / Ethernet, no PC** — an ebusd.eu adapter (v5, Shield C5, Shield C6, Stick C6): update its firmware,
+   connect it to your Wi-Fi (it opens an open AP named `EBUS`, then http://192.168.4.1) and point this app at its IP
+   on port 9999 with connection type *Adapter, enhanced protocol*. The enhanced protocol is the adapter's free
+   standard mode — the paid token is only for *micro-ebusd*, which this app does not use. *Not yet tested on hardware.*
+2. **USB** — the same ebusd.eu adapters over USB, or any other ebusd-compatible USB eBUS adapter, on a Raspberry Pi /
+   always-on PC running ebusd with `--enablehex`:
+   `ebusd -d /dev/ttyUSB0 --port=8888 --enablehex --scanconfig`. Homey itself cannot use USB devices.
+
+## Room, outdoor and valve inputs
+
+Homey's App Store does not allow a device app to read other apps' devices (`homey:manager:api`), so the room
+controller gets its inputs from the user's Flows:
+
+| Flow action card | Used for |
+|---|---|
+| *Report room temperature [t] from [sensor]* | room correction; several named sensors are averaged |
+| *Report outdoor temperature [t]* | heating curve; without it the weather for Homey's location (Open-Meteo) is used |
+| *Zone valve [1–8] is [open/closed]* | heat demand; set *Zone valves* (count) in the device settings |
+
+Readings older than the *Sensor timeout* device setting (default 180 min) are ignored.
 
 ## Development
 

@@ -42,6 +42,12 @@ class BoilerDriver extends Homey.Driver {
       .registerRunListener(async ({ device, regulation }) => device.setRegulation(regulation));
     cards.getActionCard('reset_gas')
       .registerRunListener(async ({ device, value }) => device.resetGas(value));
+    cards.getActionCard('report_room_temperature')
+      .registerRunListener(async ({ device, temperature, sensor }) => device.reportRoom(temperature, sensor));
+    cards.getActionCard('report_outdoor_temperature')
+      .registerRunListener(async ({ device, temperature }) => device.reportOutdoor(temperature));
+    cards.getActionCard('set_zone_valve')
+      .registerRunListener(async ({ device, valve, state }) => device.setValve(Number(valve), state === 'open'));
   }
 
   async onPair(session) {
